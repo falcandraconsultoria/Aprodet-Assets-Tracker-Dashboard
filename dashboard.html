@@ -1,1 +1,438 @@
+<!-- dashboard.html -->
+<div class="dashboard" id="dashboard">
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-placeholder">
+                        APD
+                    </div>
+                    <div class="title">
+                        <h1>APRODET Dashboard</h1>
+                        <p id="dashboard-subtitle">Análise Patrimonial em Tempo Real</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="date-display">
+                        <p id="current-date">Carregando data...</p>
+                    </div>
+                    <button class="btn-header" id="backToHomeBtn" title="Voltar ao início">
+                        <i class="fas fa-home"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
+    <div class="container">
+        <!-- Barra de Controle -->
+        <section class="control-bar">
+            <div class="upload-section">
+                <button class="upload-btn" id="uploadNewBtn">
+                    <i class="fas fa-sync-alt"></i> Carregar Novo Ficheiro
+                </button>
+                <div class="file-name" id="currentFileName">Nenhum ficheiro selecionado</div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="refreshAnalysisBtn">
+                    <i class="fas fa-redo-alt"></i> Atualizar Análise
+                </button>
+                <button class="btn btn-secondary" id="exportPdfBtn">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </button>
+                <button class="btn btn-help" id="helpBtn">
+                    <i class="fas fa-question-circle"></i> Ajuda
+                </button>
+            </div>
+        </section>
+
+        <!-- Filtros -->
+        <section class="filters" id="filtersSection">
+            <h3><i class="fas fa-filter"></i> Filtros Avançados</h3>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="categoryFilter"><i class="fas fa-tags"></i> Categoria</label>
+                    <select id="categoryFilter">
+                        <option value="all">Todas as Categorias</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="districtFilter"><i class="fas fa-map-marker-alt"></i> Distrito</label>
+                    <select id="districtFilter">
+                        <option value="all">Todos os Distritos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilter"><i class="fas fa-clipboard-check"></i> Estado</label>
+                    <select id="statusFilter">
+                        <option value="all">Todos os Estados</option>
+                        <option value="Bom">Bom</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Ruim">Ruim</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="valueRange"><i class="fas fa-coins"></i> Valor (R$)</label>
+                    <div class="range-inputs">
+                        <input type="number" id="minValue" placeholder="Mínimo" min="0">
+                        <span>até</span>
+                        <input type="number" id="maxValue" placeholder="Máximo" min="0">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="responsibleFilter"><i class="fas fa-user"></i> Responsável</label>
+                    <select id="responsibleFilter">
+                        <option value="all">Todos os Responsáveis</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="useFilter"><i class="fas fa-cogs"></i> Uso Atual</label>
+                    <select id="useFilter">
+                        <option value="all">Todos os Usos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" id="applyFilters">
+                    <i class="fas fa-check"></i> Aplicar Filtros
+                </button>
+                <button class="btn btn-help" id="resetFilters">
+                    <i class="fas fa-redo"></i> Limpar Filtros
+                </button>
+                <button class="btn btn-export" id="exportFilteredBtn">
+                    <i class="fas fa-download"></i> Exportar Filtrados
+                </button>
+            </div>
+        </section>
+
+        <!-- Cards de Indicadores -->
+        <section class="indicators" id="indicatorsSection">
+            <div class="card card-1">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Valor Total do Patrimônio</div>
+                        <div class="card-value" id="totalValue">R$ 0,00</div>
+                        <div class="card-change" id="valueChange">
+                            <i class="fas fa-info-circle"></i> Soma de todos os valores
+                        </div>
+                    </div>
+                    <div class="card-icon icon-1">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-2">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Total de Itens</div>
+                        <div class="card-value" id="totalItems">0</div>
+                        <div class="card-change" id="itemsChange">
+                            <i class="fas fa-info-circle"></i> Itens no inventário
+                        </div>
+                    </div>
+                    <div class="card-icon icon-2">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-3">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Estado Médio</div>
+                        <div class="card-value" id="avgStatus">0%</div>
+                        <div class="card-change" id="statusChange">
+                            <i class="fas fa-info-circle"></i> Índice de conservação
+                        </div>
+                    </div>
+                    <div class="card-icon icon-3">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-4">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Itens Críticos</div>
+                        <div class="card-value" id="criticalItems">0</div>
+                        <div class="card-change">
+                            <i class="fas fa-exclamation-triangle"></i> Requerem atenção
+                        </div>
+                    </div>
+                    <div class="card-icon icon-4">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-5">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Idade Média</div>
+                        <div class="card-value" id="avgAge">0 anos</div>
+                        <div class="card-change">
+                            <i class="fas fa-calendar-alt"></i> Tempo desde aquisição
+                        </div>
+                    </div>
+                    <div class="card-icon icon-5">
+                        <i class="fas fa-history"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-6">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Vida Útil Restante</div>
+                        <div class="card-value" id="avgLifeLeft">0%</div>
+                        <div class="card-change">
+                            <i class="fas fa-hourglass-half"></i> Percentual médio
+                        </div>
+                    </div>
+                    <div class="card-icon icon-6">
+                        <i class="fas fa-hourglass"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gráficos -->
+        <section class="charts-grid" id="chartsSection">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Valor por Categoria</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-chart="category" title="Alternar tipo de gráfico">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Estado de Conservação</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-chart="status" title="Alternar tipo de gráfico">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title"><i class="fas fa-chart-line"></i> Aquisições ao Longo do Tempo</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-chart="timeline" title="Alternar visualização">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title"><i class="fas fa-map-marked-alt"></i> Distribuição por Distrito</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-chart="district" title="Alternar visualização">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="districtChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container full-width">
+                <div class="chart-header">
+                    <h3 class="chart-title"><i class="fas fa-chart-area"></i> Top 10 Itens Mais Valiosos</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-chart="top10" title="Ordenar por">
+                            <i class="fas fa-sort-amount-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="top10Chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container full-width">
+                <div class="chart-header">
+                    <h3 class="chart-title"><i class="fas fa-calendar-check"></i> Verificações Pendentes</h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-chart="verifications" title="Filtrar por período">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="verificationsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabelas de Dados -->
+        <section class="data-tables">
+            <div class="table-section">
+                <div class="table-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Itens Críticos</h3>
+                    <span class="badge critical" id="criticalCount">0 itens</span>
+                </div>
+                <div class="table-container">
+                    <table id="criticalTable">
+                        <thead>
+                            <tr>
+                                <th>ID Item</th>
+                                <th>Nome do Item</th>
+                                <th>Categoria</th>
+                                <th>Estado</th>
+                                <th>Localização</th>
+                                <th>Valor (R$)</th>
+                                <th>Responsável</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="criticalTableBody">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <div class="table-header">
+                    <h3><i class="fas fa-list-ol"></i> Todos os Itens</h3>
+                    <div class="table-controls">
+                        <input type="text" id="searchTable" placeholder="Pesquisar...">
+                        <select id="itemsPerPage">
+                            <option value="10">10 itens</option>
+                            <option value="25">25 itens</option>
+                            <option value="50">50 itens</option>
+                            <option value="100">100 itens</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="allItemsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Estado</th>
+                                <th>Valor</th>
+                                <th>Localização</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allItemsTableBody">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div class="pagination" id="pagination">
+                        <!-- Paginação será gerada via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-database"></i> <strong id="totalRows">0</strong> itens processados</p>
+                    <p><i class="fas fa-clock"></i> Última atualização: <span id="lastUpdate">-</span></p>
+                </div>
+                <div class="footer-notes">
+                    <p>APRODET Dashboard v1.0 | Sistema de análise patrimonial</p>
+                    <p>© 2024 Todos os direitos reservados | Dados processados localmente</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Modal de Ajuda -->
+<div class="modal" id="helpModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-question-circle"></i> Ajuda - Dashboard APRODET</h2>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="help-tabs">
+                <button class="help-tab active" data-tab="upload">Upload</button>
+                <button class="help-tab" data-tab="filters">Filtros</button>
+                <button class="help-tab" data-tab="charts">Gráficos</button>
+                <button class="help-tab" data-tab="export">Exportação</button>
+            </div>
+            
+            <div class="help-content">
+                <div class="tab-content active" id="upload-tab">
+                    <h3>Como carregar arquivos</h3>
+                    <p>1. Clique em "Carregar Novo Ficheiro" ou arraste um arquivo para a área designada</p>
+                    <p>2. Formatos suportados: Excel (.xlsx, .xls) e CSV</p>
+                    <p>3. Certifique-se que o arquivo contém todas as 19 colunas obrigatórias</p>
+                    <p>4. Os dados são processados localmente - nenhuma informação é enviada para servidores externos</p>
+                </div>
+                
+                <div class="tab-content" id="filters-tab">
+                    <h3>Como usar filtros</h3>
+                    <p>• <strong>Categoria:</strong> Filtre por tipo de item (mobiliário, equipamento, etc.)</p>
+                    <p>• <strong>Distrito:</strong> Selecione itens por localização geográfica</p>
+                    <p>• <strong>Estado:</strong> Filtre por estado de conservação (Bom, Regular, Ruim)</p>
+                    <p>• <strong>Valor:</strong> Defina faixa de valores para análise específica</p>
+                    <p>• <strong>Responsável:</strong> Visualize itens por pessoa responsável</p>
+                    <p>• Use "Aplicar Filtros" para confirmar e "Limpar Filtros" para resetar</p>
+                </div>
+                
+                <div class="tab-content" id="charts-tab">
+                    <h3>Interpretando os gráficos</h3>
+                    <p>• <strong>Valor por Categoria:</strong> Distribuição do valor total por tipo de item</p>
+                    <p>• <strong>Estado de Conservação:</strong> Percentual de itens em cada estado</p>
+                    <p>• <strong>Aquisições ao Longo do Tempo:</strong> Histórico de investimentos</p>
+                    <p>• <strong>Distribuição por Distrito:</strong> Localização geográfica dos ativos</p>
+                    <p>• <strong>Top 10 Itens:</strong> Os itens de maior valor do patrimônio</p>
+                    <p>• Clique nos botões de ação em cada gráfico para alternar visualizações</p>
+                </div>
+                
+                <div class="tab-content" id="export-tab">
+                    <h3>Exportando dados</h3>
+                    <p>• <strong>Exportar PDF:</strong> Gera relatório completo com todos os gráficos e tabelas</p>
+                    <p>• <strong>Exportar Filtrados:</strong> Exporta apenas os dados visíveis após aplicação de filtros</p>
+                    <p>• Os relatórios incluem data de geração e todos os indicadores calculados</p>
+                    <p>• Para melhores resultados em PDF, maximize a janela do dashboard antes de exportar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Carregamento -->
+<div class="modal loading-modal" id="loadingModal">
+    <div class="modal-content">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingMessage">Processando arquivo...</p>
+        </div>
+    </div>
+</div>
