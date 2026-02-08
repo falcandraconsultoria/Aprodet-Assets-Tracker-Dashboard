@@ -12,90 +12,72 @@ body {
     line-height: 1.6;
 }
 
-/* ===== LAYOUT CONTAINERS ===== */
+/* ===== LAYOUT ===== */
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-.page {
-    min-height: calc(100vh - 80px);
-    padding: 30px 0;
+/* ===== NOVA BARRA SUPERIOR AZUL ===== */
+.header-container {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    padding: 20px 30px;
+    border-radius: 0 0 15px 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-/* ===== HEADER ===== */
-.header {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
-    color: white;
-    padding: 20px 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 100;
+.header-container::before {
+    content: "⋯";
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    font-size: 32px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: bold;
+    line-height: 1;
 }
 
 .header-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 20px;
+    color: white;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-}
-
-.header-title h1 {
-    font-size: 28px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.header-title h2 {
-    font-size: 16px;
-    font-weight: 400;
-    opacity: 0.9;
-    margin-top: 5px;
-}
-
-.header-title p {
-    font-size: 13px;
-    opacity: 0.8;
-    margin-top: 8px;
-}
-
-/* Logo APRODET */
 .aprodet-logo {
+    font-size: 32px;
+    font-weight: 800;
+    color: #f97316 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+    margin-left: 50px;
+}
+
+.dashboard-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    flex-grow: 1;
     text-align: center;
 }
 
-.logo-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-visual {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 5px;
-}
-
-.logo-circle {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: #3498db;
-}
-
-.logo-text {
-    font-size: 22px;
-    font-weight: 700;
-    color: #3498db;
-    margin-bottom: 3px;
+.header-info {
+    font-size: 14px;
+    opacity: 0.9;
+    text-align: right;
+    margin-top: 5px;
 }
 
 /* ===== UPLOAD PAGE ===== */
+.page {
+    min-height: calc(100vh - 100px);
+    padding: 30px 0;
+}
+
 .upload-container {
     max-width: 800px;
     margin: 0 auto;
@@ -157,7 +139,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* ===== BUTTONS ===== */
 .btn-primary {
     background-color: #3498db;
     color: white;
@@ -175,6 +156,31 @@ body {
 
 .btn-primary:hover {
     background-color: #2980b9;
+}
+
+.file-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    display: none;
+}
+
+.file-info h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.file-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.file-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
 }
 
 .btn-secondary {
@@ -210,63 +216,6 @@ body {
     background-color: #27ae60;
 }
 
-.btn-outline {
-    background-color: transparent;
-    color: #3498db;
-    border: 2px solid #3498db;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: 500;
-}
-
-.btn-outline:hover {
-    background-color: #3498db;
-    color: white;
-}
-
-.btn-icon {
-    background: none;
-    border: none;
-    color: #3498db;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.btn-icon:hover {
-    background-color: #f0f8ff;
-}
-
-/* ===== FILE INFO ===== */
-.file-info {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
-    display: none;
-}
-
-.file-info h3 {
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-.file-details {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.file-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-}
-
 /* ===== DASHBOARD PAGE ===== */
 .dashboard-header {
     display: flex;
@@ -292,63 +241,23 @@ body {
     gap: 15px;
 }
 
-/* ===== KPI CARDS ===== */
-.kpi-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.kpi-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s, box-shadow 0.3s;
-    text-align: center;
-}
-
-.kpi-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-.kpi-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 10px;
-}
-
-/* Ajuste para valor total com números longos */
-.smaller-font {
-    font-size: 19px !important;
-    line-height: 1.2;
-}
-
-.currency-symbol {
-    font-size: 20px;
+.btn-outline {
+    background-color: transparent;
     color: #3498db;
-    margin-right: 5px;
-}
-
-.kpi-label {
-    font-size: 16px;
-    color: #7f8c8d;
-    margin-bottom: 15px;
-}
-
-.kpi-details {
-    font-size: 14px;
-    color: #34495e;
-    background-color: #f8f9fa;
-    padding: 8px 12px;
+    border: 2px solid #3498db;
+    padding: 10px 20px;
     border-radius: 6px;
-    margin-top: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
 }
 
-/* ===== FILTERS SECTION ===== */
+.btn-outline:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+/* ===== FILTERS SECTION (AGORA ACIMA DOS CARDS) ===== */
 .filters-section {
     background: white;
     border-radius: 12px;
@@ -464,6 +373,62 @@ body {
     background-color: #c0392b;
 }
 
+/* ===== KPI CARDS (SEM ÍCONES) ===== */
+.kpi-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* Ajuste para valor total com números longos */
+.smaller-font {
+    font-size: 19px !important;
+    line-height: 1.2;
+}
+
+.currency-symbol {
+    font-size: 20px;
+    color: #3498db;
+    margin-right: 5px;
+}
+
+.kpi-label {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 15px;
+}
+
+.kpi-details {
+    font-size: 14px;
+    color: #34495e;
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
 /* ===== CHARTS SECTION ===== */
 .charts-section {
     display: grid;
@@ -515,18 +480,12 @@ body {
     font-size: 12px;
 }
 
-/* ===== TABLES SECTION ===== */
-.tables-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+/* ===== TABLES SECTION (AGORA "TODOS OS ITENS" ACIMA DE "ITENS CRÍTICOS") ===== */
+.tables-container {
+    display: flex;
+    flex-direction: column;
     gap: 30px;
     margin-bottom: 40px;
-}
-
-@media (max-width: 1100px) {
-    .tables-section {
-        grid-template-columns: 1fr;
-    }
 }
 
 .table-container {
@@ -534,6 +493,7 @@ body {
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 .table-container h3 {
@@ -622,6 +582,22 @@ tr:hover {
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
+}
+
+/* ===== BUTTON ICONS ===== */
+.btn-icon {
+    background: none;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn-icon:hover {
+    background-color: #f0f8ff;
 }
 
 /* ===== SUMMARY SECTION ===== */
@@ -1040,80 +1016,26 @@ tr:hover {
     color: #34495e;
 }
 
-/* ===== UTILITY CLASSES ===== */
-.hidden {
-    display: none !important;
-}
-
-.visible {
-    display: block !important;
-}
-
-.flex {
-    display: flex !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-left {
-    text-align: left;
-}
-
-.mt-10 { margin-top: 10px; }
-.mt-20 { margin-top: 20px; }
-.mt-30 { margin-top: 30px; }
-.mb-10 { margin-bottom: 10px; }
-.mb-20 { margin-bottom: 20px; }
-.mb-30 { margin-bottom: 30px; }
-.ml-10 { margin-left: 10px; }
-.mr-10 { margin-right: 10px; }
-
-.p-10 { padding: 10px; }
-.p-20 { padding: 20px; }
-.p-30 { padding: 30px; }
-
-/* ===== FALCANDRA BRANDING ===== */
-.falcandra-branding {
-    text-align: center;
-    margin: 15px 0;
-}
-
-.falcandra-branding hr {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 20px 0;
-}
-
-.falcandra-branding p {
-    font-size: 14px;
-    color: #3498db;
-    font-weight: 600;
-    font-style: italic;
-}
-
-/* ===== REMOVED FILTER CONTROLS ===== */
-.value-filter-controls {
-    display: none !important;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
+        gap: 15px;
     }
     
-    .header-left {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
+    .header-container::before {
+        position: static;
+        margin-bottom: 10px;
+        display: block;
+    }
+    
+    .aprodet-logo {
+        margin-left: 0;
+    }
+    
+    .dashboard-title {
+        font-size: 20px;
     }
     
     .upload-card {
@@ -1124,8 +1046,7 @@ tr:hover {
         grid-template-columns: 1fr;
     }
     
-    .charts-section,
-    .tables-section {
+    .charts-section {
         grid-template-columns: 1fr;
     }
     
@@ -1153,93 +1074,28 @@ tr:hover {
         gap: 15px;
         align-items: flex-start;
     }
-    
-    .summary-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .file-details {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .detail-row {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .detail-label {
-        width: 100%;
-    }
 }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0 15px;
-    }
-    
-    .upload-card {
-        padding: 20px;
-    }
-    
-    .chart-container,
-    .table-container,
-    .summary-section,
-    .recommendations-section,
-    .filters-section {
-        padding: 20px;
-    }
-    
-    .kpi-card {
-        padding: 20px;
-    }
-    
-    .notification {
-        left: 10px;
-        right: 10px;
-        max-width: none;
-    }
-    
-    .modal-content {
-        width: 95%;
-    }
+/* ===== FILTROS REMOVIDOS ===== */
+.value-filter-controls {
+    display: none !important;
 }
 
-/* ===== PRINT STYLES ===== */
-@media print {
-    .header,
-    .dashboard-actions,
-    .filters-section,
-    .chart-actions,
-    .btn-icon,
-    .footer {
-        display: none !important;
-    }
-    
-    .page {
-        padding: 0;
-    }
-    
-    .kpi-cards,
-    .charts-section,
-    .tables-section,
-    .summary-section,
-    .recommendations-section {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-    
-    body {
-        background-color: white;
-        color: black;
-    }
-    
-    .kpi-card,
-    .chart-container,
-    .table-container,
-    .summary-section,
-    .recommendations-section {
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
+/* ===== FALCANDRA BRANDING ===== */
+.falcandra-branding {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.falcandra-branding hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
+}
+
+.falcandra-branding p {
+    font-size: 14px;
+    color: #3498db;
+    font-weight: 600;
+    font-style: italic;
 }
