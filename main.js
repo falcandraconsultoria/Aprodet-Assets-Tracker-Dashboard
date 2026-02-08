@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardEstadoMedio = document.getElementById("avgStatus");
     const cardItensCriticos = document.getElementById("criticalItems");
 
-    const btnDownload = document.getElementById("exportPdfBtn");
+    const btnDownload = document.getElementById("btnDownload");
 
     /* =========================================================
        UPLOAD DO EXCEL
