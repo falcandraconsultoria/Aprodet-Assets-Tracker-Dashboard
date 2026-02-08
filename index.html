@@ -36,80 +36,62 @@
             padding: 0 20px;
         }
         
-        /* ===== HEADER ===== */
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
-            color: white;
-            padding: 20px 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        /* ===== NOVA BARRA SUPERIOR AZUL ===== */
+        .header-container {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            padding: 20px 30px;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             position: relative;
-            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .header-container::before {
+            content: "⋯";
+            position: absolute;
+            top: 15px;
+            left: 25px;
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: bold;
+            line-height: 1;
         }
         
         .header-content {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 20px;
+            color: white;
         }
         
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-        
-        .header-title h1 {
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        
-        .header-title h2 {
-            font-size: 16px;
-            font-weight: 400;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-        
-        .header-title p {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-top: 8px;
-        }
-        
-        /* Logo APRODET */
         .aprodet-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: #f97316 !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            margin-left: 50px;
+        }
+        
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            flex-grow: 1;
             text-align: center;
         }
         
-        .logo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .logo-visual {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 5px;
-        }
-        
-        .logo-circle {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #3498db;
-        }
-        
-        .logo-text {
-            font-size: 22px;
-            font-weight: 700;
-            color: #3498db;
-            margin-bottom: 3px;
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+            text-align: right;
+            margin-top: 5px;
         }
         
         /* ===== UPLOAD PAGE ===== */
         .page {
-            min-height: calc(100vh - 80px);
+            min-height: calc(100vh - 100px);
             padding: 30px 0;
         }
         
@@ -292,63 +274,7 @@
             color: white;
         }
         
-        /* ===== KPI CARDS ===== */
-        .kpi-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .kpi-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-align: center;
-        }
-        
-        .kpi-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .kpi-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        /* Ajuste para valor total com números longos - NOVO */
-        .smaller-font {
-            font-size: 19px !important;
-            line-height: 1.2;
-        }
-        
-        .currency-symbol {
-            font-size: 20px;
-            color: #3498db;
-            margin-right: 5px;
-        }
-        
-        .kpi-label {
-            font-size: 16px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
-        
-        .kpi-details {
-            font-size: 14px;
-            color: #34495e;
-            background-color: #f8f9fa;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-        
-        /* ===== FILTERS SECTION ===== */
+        /* ===== FILTERS SECTION (AGORA ACIMA DOS CARDS) ===== */
         .filters-section {
             background: white;
             border-radius: 12px;
@@ -464,6 +390,62 @@
             background-color: #c0392b;
         }
         
+        /* ===== KPI CARDS (SEM ÍCONES) ===== */
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        /* Ajuste para valor total com números longos */
+        .smaller-font {
+            font-size: 19px !important;
+            line-height: 1.2;
+        }
+        
+        .currency-symbol {
+            font-size: 20px;
+            color: #3498db;
+            margin-right: 5px;
+        }
+        
+        .kpi-label {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .kpi-details {
+            font-size: 14px;
+            color: #34495e;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
         /* ===== CHARTS SECTION ===== */
         .charts-section {
             display: grid;
@@ -515,18 +497,12 @@
             font-size: 12px;
         }
         
-        /* ===== TABLES SECTION ===== */
-        .tables-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        /* ===== TABLES SECTION (AGORA "TODOS OS ITENS" ACIMA DE "ITENS CRÍTICOS") ===== */
+        .tables-container {
+            display: flex;
+            flex-direction: column;
             gap: 30px;
             margin-bottom: 40px;
-        }
-        
-        @media (max-width: 1100px) {
-            .tables-section {
-                grid-template-columns: 1fr;
-            }
         }
         
         .table-container {
@@ -534,6 +510,7 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 100%;
         }
         
         .table-container h3 {
@@ -1061,13 +1038,21 @@
             .header-content {
                 flex-direction: column;
                 text-align: center;
-                gap: 20px;
+                gap: 15px;
             }
             
-            .header-left {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
+            .header-container::before {
+                position: static;
+                margin-bottom: 10px;
+                display: block;
+            }
+            
+            .aprodet-logo {
+                margin-left: 0;
+            }
+            
+            .dashboard-title {
+                font-size: 20px;
             }
             
             .upload-card {
@@ -1078,8 +1063,7 @@
                 grid-template-columns: 1fr;
             }
             
-            .charts-section,
-            .tables-section {
+            .charts-section {
                 grid-template-columns: 1fr;
             }
             
@@ -1135,31 +1119,16 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container header-content">
-            <div class="header-left">
-                <div class="header-title">
-                    <h1>APRODET Dashboard</h1>
-                    <h2>Análise Patrimonial</h2>
-                    <p id="currentFileInfo">Analisando: Aprodet_Filled_Data.xlsx</p>
-                </div>
-            </div>
-            
-            <!-- Logotipo APRODET -->
-            <div class="aprodet-logo">
-                <div class="logo-container">
-                    <div class="logo-visual">
-                        <div class="logo-circle"></div>
-                        <div class="logo-circle"></div>
-                        <div class="logo-circle"></div>
-                        <div class="logo-circle"></div>
-                    </div>
-                    <div class="logo-text">APRODET</div>
-                </div>
+    <!-- Nova Barra Superior Azul -->
+    <div class="header-container">
+        <div class="header-content">
+            <div class="aprodet-logo">APRODET</div>
+            <div class="dashboard-title">
+                APRODET Dashboard
+                <div class="header-info" id="currentFileInfo">Analisando: Aprodet_Filled_Data.xlsx</div>
             </div>
         </div>
-    </header>
+    </div>
 
     <!-- Upload Page -->
     <div id="uploadPage" class="page">
@@ -1236,36 +1205,7 @@
                 </div>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="kpi-cards">
-                <div class="kpi-card">
-                    <div id="totalValue" class="kpi-value">
-                        <span class="currency-symbol">MZN</span> 0,00
-                    </div>
-                    <div class="kpi-label">Valor Total do Patrimônio</div>
-                    <div class="kpi-details">Soma de todos os valores</div>
-                </div>
-                
-                <div class="kpi-card">
-                    <div id="totalItems" class="kpi-value">0</div>
-                    <div class="kpi-label">Total de Itens</div>
-                    <div class="kpi-details">Itens no inventário</div>
-                </div>
-                
-                <div class="kpi-card">
-                    <div id="avgStatus" class="kpi-value">0%</div>
-                    <div class="kpi-label">Índice de Conservação</div>
-                    <div class="kpi-details">Estado médio dos itens</div>
-                </div>
-                
-                <div class="kpi-card">
-                    <div id="criticalItems" class="kpi-value">0</div>
-                    <div class="kpi-label">Itens Críticos</div>
-                    <div class="kpi-details">Requerem atenção imediata</div>
-                </div>
-            </div>
-
-            <!-- Filters Section - SEM FILTROS DE VALOR -->
+            <!-- Filters Section (AGORA ACIMA DOS CARDS) -->
             <div class="filters-section">
                 <h2 class="section-title">Filtros Avançados</h2>
                 <div class="filters-grid">
@@ -1330,6 +1270,35 @@
                 </div>
             </div>
 
+            <!-- KPI Cards (SEM ÍCONES) -->
+            <div class="kpi-cards">
+                <div class="kpi-card">
+                    <div id="totalValue" class="kpi-value">
+                        <span class="currency-symbol">MZN</span> 0,00
+                    </div>
+                    <div class="kpi-label">Valor Total do Patrimônio</div>
+                    <div class="kpi-details">Soma de todos os valores</div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div id="totalItems" class="kpi-value">0</div>
+                    <div class="kpi-label">Total de Itens</div>
+                    <div class="kpi-details">Itens no inventário</div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div id="avgStatus" class="kpi-value">0%</div>
+                    <div class="kpi-label">Índice de Conservação</div>
+                    <div class="kpi-details">Estado médio dos itens</div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div id="criticalItems" class="kpi-value">0</div>
+                    <div class="kpi-label">Itens Críticos</div>
+                    <div class="kpi-details">Requerem atenção imediata</div>
+                </div>
+            </div>
+
             <!-- Charts Section -->
             <div class="charts-section">
                 <!-- Estado de Conservação - Barras Horizontais (SEM LEGENDA) -->
@@ -1385,35 +1354,9 @@
                 </div>
             </div>
 
-            <!-- Tables Section -->
-            <div class="tables-section">
-                <!-- Itens Críticos -->
-                <div class="table-container">
-                    <h3>
-                        <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
-                        Itens Críticos <span id="criticalCount" style="font-size: 14px; color: #7f8c8d;">(0 itens)</span>
-                    </h3>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID do Item</th>
-                                    <th>Nome</th>
-                                    <th>Categoria</th>
-                                    <th>Estado</th>
-                                    <th>Valor (MZN)</th>
-                                    <th>Localização</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="criticalTableBody">
-                                <!-- Dados serão preenchidos por JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Todos os Itens -->
+            <!-- Tables Section - "TODOS OS ITENS" ACIMA DE "ITENS CRÍTICOS" -->
+            <div class="tables-container">
+                <!-- Todos os Itens (PRIMEIRO) -->
                 <div class="table-container">
                     <h3>Todos os Itens</h3>
                     <div style="margin-bottom: 15px;">
@@ -1459,6 +1402,32 @@
                                 <!-- Paginação será preenchida por JavaScript -->
                             </div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Itens Críticos (SEGUNDO) -->
+                <div class="table-container">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                        Itens Críticos <span id="criticalCount" style="font-size: 14px; color: #7f8c8d;">(0 itens)</span>
+                    </h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID do Item</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Estado</th>
+                                    <th>Valor (MZN)</th>
+                                    <th>Localização</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="criticalTableBody">
+                                <!-- Dados serão preenchidos por JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
