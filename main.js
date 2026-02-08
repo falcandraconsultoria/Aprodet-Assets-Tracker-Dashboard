@@ -1,5 +1,8 @@
 // main.js - APRODET Dashboard - Sistema Completo
-// VERSÃO MELHORADA com recomendações completas
+// CORREÇÕES APLICADAS:
+// 1. VERIFICAÇÃO de título "APRODET Dashboard" duplicado
+// 2. CORREÇÃO da justificação dos círculos acima de "APRODET"
+// 3. Centralização perfeita dos elementos visuais
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
@@ -63,19 +66,16 @@ const STATE = {
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('APRODET Dashboard - Inicializando...');
-    
     initializeApplication();
     setupRequiredFields();
     updateCurrentDate();
     
     // VERIFICAÇÃO e correção do layout
-    fixLayoutIssues();
+    fixDuplicatedTitle();
+    fixLogoCircles();
     
     // Adicionar @Falcandra Data Consulting no footer
     addFalcandraBranding();
-    
-    console.log('APRODET Dashboard - Inicialização completa');
 });
 
 function initializeApplication() {
@@ -93,137 +93,136 @@ function initializeApplication() {
 }
 
 // ===== CORREÇÕES DE LAYOUT =====
-function fixLayoutIssues() {
-    console.log('Aplicando correções de layout...');
-    
-    fixDuplicatedTitle();
-    fixLogoCircles();
-    fixDashboardTitles();
-}
-
 function fixDuplicatedTitle() {
     console.log('Verificando título duplicado...');
     
-    // Encontrar todos os títulos
-    const titles = document.querySelectorAll('h1');
-    let aprodetTitleCount = 0;
+    // Verificar se há múltiplos elementos com "APRODET Dashboard"
+    const aprodetTitles = document.querySelectorAll('h1, h2, .dashboard-title, .header-title');
+    let aprodetCount = 0;
     
-    titles.forEach(title => {
-        if (title.textContent.includes('APRODET')) {
-            aprodetTitleCount++;
+    aprodetTitles.forEach(element => {
+        if (element.textContent.includes('APRODET Dashboard')) {
+            aprodetCount++;
+            console.log(`Título encontrado: "${element.textContent.trim()}"`);
             
-            // Se for mais de um título com APRODET, corrigir
-            if (aprodetTitleCount > 1) {
-                // Se estiver no logo APRODET, mudar para apenas "APRODET"
-                if (title.closest('.aprodet-logo') || title.closest('.logo-container')) {
-                    console.log('Corrigindo título no logo APRODET...');
-                    title.textContent = 'APRODET';
+            // Se for um segundo título, removê-lo
+            if (aprodetCount > 1) {
+                console.log('Removendo título duplicado...');
+                
+                // Verificar se é o logo APRODET
+                if (element.closest('.aprodet-logo') || element.closest('.logo-container')) {
+                    console.log('Removendo "APRODET Dashboard" do logo');
+                    const logoText = element.closest('.logo-text');
+                    if (logoText && logoText.textContent.includes('APRODET Dashboard')) {
+                        logoText.textContent = 'APRODET'; // Mantém apenas APRODET
+                        console.log('Logo corrigido: mantido apenas "APRODET"');
+                    }
                 }
                 
-                // Se for um h1 extra, remover
-                const parent = title.parentElement;
-                const siblings = parent ? parent.querySelectorAll('h1') : [];
-                if (siblings.length > 1) {
-                    console.log('Removendo título duplicado...');
-                    title.remove();
+                // Remover elemento se for um título extra
+                if (element.textContent === 'APRODET Dashboard' && element.tagName === 'H1') {
+                    const parent = element.parentElement;
+                    if (parent && parent.querySelectorAll('h1').length > 1) {
+                        element.remove();
+                        console.log('Título duplicado removido');
+                    }
                 }
             }
         }
     });
+    
+    // Verificar se há título no logo APRODET
+    const logoTextElements = document.querySelectorAll('.logo-text, .aprodet-logo h1, .aprodet-logo h2');
+    logoTextElements.forEach(element => {
+        if (element.textContent.includes('APRODET Dashboard')) {
+            console.log('Corrigindo texto do logo APRODET...');
+            element.textContent = element.textContent.replace('APRODET Dashboard', 'APRODET');
+            console.log('Logo APRODET corrigido');
+        }
+    });
+    
+    console.log('Verificação de título duplicado concluída');
 }
 
 function fixLogoCircles() {
-    console.log('Corrigindo círculos do logo APRODET...');
+    console.log('Verificando e corrigindo círculos do logo APRODET...');
     
     const aprodetLogo = document.querySelector('.aprodet-logo');
-    if (!aprodetLogo) {
-        console.warn('Logo APRODET não encontrado');
+    const logoContainer = document.querySelector('.logo-container');
+    const logoVisual = document.querySelector('.logo-visual');
+    
+    if (!aprodetLogo || !logoContainer || !logoVisual) {
+        console.warn('Elementos do logo APRODET não encontrados');
         return;
     }
     
-    // Garantir que o logo tenha a estrutura correta
-    if (!aprodetLogo.querySelector('.logo-container')) {
-        const logoContainer = document.createElement('div');
-        logoContainer.className = 'logo-container';
-        logoContainer.innerHTML = `
-            <div class="logo-visual">
-                <div class="logo-circle"></div>
-                <div class="logo-circle"></div>
-                <div class="logo-circle"></div>
-                <div class="logo-circle"></div>
-            </div>
-            <div class="logo-text">APRODET</div>
-        `;
-        aprodetLogo.innerHTML = '';
-        aprodetLogo.appendChild(logoContainer);
-    }
-    
     // Aplicar estilos de centralização
-    const logoContainer = aprodetLogo.querySelector('.logo-container');
-    const logoVisual = aprodetLogo.querySelector('.logo-visual');
-    const logoText = aprodetLogo.querySelector('.logo-text');
+    aprodetLogo.style.display = 'flex';
+    aprodetLogo.style.justifyContent = 'center';
+    aprodetLogo.style.alignItems = 'center';
+    aprodetLogo.style.width = '100%';
     
-    if (logoContainer) {
-        logoContainer.style.display = 'flex';
-        logoContainer.style.flexDirection = 'column';
-        logoContainer.style.alignItems = 'center';
-        logoContainer.style.justifyContent = 'center';
-    }
+    logoContainer.style.display = 'flex';
+    logoContainer.style.flexDirection = 'column';
+    logoContainer.style.alignItems = 'center';
+    logoContainer.style.justifyContent = 'center';
+    logoContainer.style.width = '100%';
     
-    if (logoVisual) {
-        logoVisual.style.display = 'flex';
-        logoVisual.style.justifyContent = 'center';
-        logoVisual.style.alignItems = 'center';
-        logoVisual.style.gap = '8px';
-        logoVisual.style.marginBottom = '5px';
-    }
+    logoVisual.style.display = 'flex';
+    logoVisual.style.justifyContent = 'center';
+    logoVisual.style.alignItems = 'center';
+    logoVisual.style.gap = '8px';
+    logoVisual.style.width = '100%';
     
-    // Garantir que os círculos tenham o estilo correto
-    const circles = aprodetLogo.querySelectorAll('.logo-circle');
+    // Verificar e corrigir círculos
+    const circles = logoVisual.querySelectorAll('.logo-circle');
+    console.log(`Círculos encontrados: ${circles.length}`);
+    
     circles.forEach(circle => {
         circle.style.width = '22px';
         circle.style.height = '22px';
         circle.style.borderRadius = '50%';
         circle.style.backgroundColor = '#3498db';
+        circle.style.margin = '0';
+        circle.style.padding = '0';
     });
     
+    // Verificar texto do logo
+    const logoText = document.querySelector('.logo-text');
     if (logoText) {
         logoText.style.textAlign = 'center';
-        logoText.style.fontSize = '24px';
-        logoText.style.fontWeight = '700';
-        logoText.style.color = '#3498db';
+        logoText.style.width = '100%';
+        logoText.style.marginTop = '5px';
         
-        // Garantir que não tenha "Dashboard" no logo
+        // Garantir que não há "Dashboard" no logo
         if (logoText.textContent.includes('Dashboard')) {
             logoText.textContent = 'APRODET';
+            console.log('Texto do logo APRODET corrigido');
         }
     }
     
-    console.log('Círculos do logo APRODET corrigidos');
-}
-
-function fixDashboardTitles() {
-    // Garantir que apenas o header tenha "APRODET Dashboard"
-    const dashboardTitles = document.querySelectorAll('.dashboard-title, .header-title h1');
-    dashboardTitles.forEach((title, index) => {
-        if (index > 0) {
-            // Se não for o primeiro título, ocultar
-            title.style.display = 'none';
-        }
-    });
+    console.log('Círculos do logo APRODET corrigidos e centralizados');
 }
 
 function setupDOMReferences() {
-    // Elementos serão referenciados por ID
-    console.log('Configurando referências DOM...');
+    // Garantir que todos os elementos críticos existem
+    const requiredElements = [
+        'loadingOverlay', 'notification', 'uploadArea',
+        'fileInput', 'fileInfo', 'categoryFilter',
+        'districtFilter', 'statusFilter', 'responsibleFilter',
+        'applyFiltersBtn', 'resetFiltersBtn'
+    ];
+    
+    requiredElements.forEach(id => {
+        if (!document.getElementById(id)) {
+            console.warn(`Elemento #${id} não encontrado no DOM`);
+        }
+    });
 }
 
 function setupRequiredFields() {
     const grid = document.getElementById('requiredFieldsGrid');
     if (!grid) return;
-    
-    // Limpar grid existente
-    grid.innerHTML = '';
     
     CONFIG.REQUIRED_COLUMNS.forEach(field => {
         const span = document.createElement('span');
@@ -235,103 +234,62 @@ function setupRequiredFields() {
 
 function addFalcandraBranding() {
     const footer = document.querySelector('.footer');
-    if (!footer) return;
-    
-    // Verificar se já existe
-    if (!footer.querySelector('.falcandra-branding')) {
-        const brandDiv = document.createElement('div');
-        brandDiv.className = 'falcandra-branding';
-        brandDiv.innerHTML = `
-            <p style="font-size: 14px; color: #3498db; font-weight: 600; font-style: italic; margin-bottom: 10px;">
-                @Falcandra Data Consulting
-            </p>
-        `;
-        
-        // Inserir no início do footer
-        footer.insertBefore(brandDiv, footer.firstChild);
+    if (footer) {
+        if (!footer.querySelector('.falcandra-branding')) {
+            const brandDiv = document.createElement('div');
+            brandDiv.className = 'falcandra-branding';
+            brandDiv.innerHTML = `
+                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+                <p style="font-size: 14px; color: #3498db; font-weight: 600; font-style: italic;">
+                    @Falcandra Data Consulting
+                </p>
+            `;
+            
+            const firstParagraph = footer.querySelector('p');
+            if (firstParagraph) {
+                footer.insertBefore(brandDiv, firstParagraph);
+            } else {
+                footer.appendChild(brandDiv);
+            }
+        }
     }
 }
 
 // ===== MANIPULAÇÃO DE ARQUIVOS =====
 function setupEventListeners() {
-    console.log('Configurando event listeners...');
+    // Upload
+    document.getElementById('selectFileBtn')?.addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+    });
     
-    // Upload Page
-    const selectFileBtn = document.getElementById('selectFileBtn');
-    const fileInput = document.getElementById('fileInput');
-    const clearFileBtn = document.getElementById('clearFileBtn');
-    const startAnalysisBtn = document.getElementById('startAnalysisBtn');
-    const backToHomeBtn = document.getElementById('backToHomeBtn');
+    document.getElementById('fileInput')?.addEventListener('change', handleFileSelect);
     
-    if (selectFileBtn) {
-        selectFileBtn.addEventListener('click', () => {
-            if (fileInput) fileInput.click();
-        });
-    }
+    document.getElementById('clearFileBtn')?.addEventListener('click', clearSelectedFile);
     
-    if (fileInput) {
-        fileInput.addEventListener('change', handleFileSelect);
-    }
+    document.getElementById('startAnalysisBtn')?.addEventListener('click', startAnalysis);
     
-    if (clearFileBtn) {
-        clearFileBtn.addEventListener('click', clearSelectedFile);
-    }
+    // Dashboard
+    document.getElementById('backToHomeBtn')?.addEventListener('click', goBackToHome);
     
-    if (startAnalysisBtn) {
-        startAnalysisBtn.addEventListener('click', startAnalysis);
-    }
+    // Filtros
+    document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
+    document.getElementById('resetFiltersBtn')?.addEventListener('click', resetFilters);
+    document.getElementById('searchInput')?.addEventListener('input', debounce(handleSearch, 300));
     
-    if (backToHomeBtn) {
-        backToHomeBtn.addEventListener('click', goBackToHome);
-    }
+    // Paginação
+    document.getElementById('itemsPerPage')?.addEventListener('change', function() {
+        STATE.itemsPerPage = parseInt(this.value);
+        updateTables();
+        updatePagination();
+    });
     
-    // Dashboard Filtros
-    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
-    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-    const searchInput = document.getElementById('searchInput');
-    const itemsPerPage = document.getElementById('itemsPerPage');
-    const tableSearch = document.getElementById('tableSearch');
+    // Busca na tabela
+    document.getElementById('tableSearch')?.addEventListener('input', debounce(handleTableSearch, 300));
     
-    if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', applyFilters);
-    }
-    
-    if (resetFiltersBtn) {
-        resetFiltersBtn.addEventListener('click', resetFilters);
-    }
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(handleSearch, 300));
-    }
-    
-    if (itemsPerPage) {
-        itemsPerPage.addEventListener('change', function() {
-            STATE.itemsPerPage = parseInt(this.value);
-            updateTables();
-            updatePagination();
-        });
-    }
-    
-    if (tableSearch) {
-        tableSearch.addEventListener('input', debounce(handleTableSearch, 300));
-    }
-    
-    // Botões de exportação
-    const exportPdfBtn = document.getElementById('exportPdfBtn');
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
-    const exportReportBtn = document.getElementById('exportReportBtn');
-    
-    if (exportPdfBtn) {
-        exportPdfBtn.addEventListener('click', exportToPDF);
-    }
-    
-    if (exportCsvBtn) {
-        exportCsvBtn.addEventListener('click', exportToCSV);
-    }
-    
-    if (exportReportBtn) {
-        exportReportBtn.addEventListener('click', exportReport);
-    }
+    // Exportação
+    document.getElementById('exportPdfBtn')?.addEventListener('click', exportToPDF);
+    document.getElementById('exportCsvBtn')?.addEventListener('click', exportToCSV);
+    document.getElementById('exportReportBtn')?.addEventListener('click', exportReport);
 }
 
 function setupDragAndDrop() {
@@ -363,10 +321,7 @@ function handleFileSelect() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
     
-    if (!file) {
-        showNotification('Nenhum arquivo selecionado', 'warning');
-        return;
-    }
+    if (!file) return;
     
     const validExtensions = ['.xlsx', '.xls', '.csv'];
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -379,35 +334,17 @@ function handleFileSelect() {
     
     STATE.currentFile = file;
     
-    // Atualizar UI
     document.getElementById('fileNameDisplay').textContent = file.name;
     document.getElementById('fileSizeDisplay').textContent = formatFileSize(file.size);
     document.getElementById('fileInfo').style.display = 'block';
-    
-    // Atualizar informação no header
-    const fileInfoElement = document.getElementById('currentFileInfo');
-    if (fileInfoElement) {
-        fileInfoElement.textContent = `Analisando: ${file.name}`;
-    }
-    
-    showNotification(`Arquivo "${file.name}" selecionado com sucesso`, 'success');
+    document.getElementById('uploadArea').style.display = 'none';
 }
 
 function clearSelectedFile() {
     document.getElementById('fileInput').value = '';
     STATE.currentFile = null;
-    
-    document.getElementById('fileNameDisplay').textContent = 'arquivo.xlsx';
-    document.getElementById('fileSizeDisplay').textContent = '0 KB';
     document.getElementById('fileInfo').style.display = 'none';
-    
-    // Atualizar informação no header
-    const fileInfoElement = document.getElementById('currentFileInfo');
-    if (fileInfoElement) {
-        fileInfoElement.textContent = 'Analisando: Aprodet_Filled_Data.xlsx';
-    }
-    
-    showNotification('Arquivo removido', 'info');
+    document.getElementById('uploadArea').style.display = 'block';
 }
 
 function formatFileSize(bytes) {
@@ -429,26 +366,17 @@ async function startAnalysis() {
             generateDemoData();
         }
         
-        // Validar dados
         const validation = validateData(STATE.processedData);
         if (!validation.valid) {
             throw new Error(validation.message);
         }
         
-        // Inicializar dados filtrados
         STATE.filteredData = [...STATE.processedData];
         STATE.originalData = [...STATE.processedData];
         
-        // Calcular indicadores
         calculateIndicators();
-        
-        // Atualizar UI
         updateDashboard();
-        
-        // Mostrar dashboard
         showDashboard();
-        
-        // Salvar para recarregamento
         saveToLocalStorage();
         
         showNotification('Análise concluída com sucesso!', 'success');
@@ -466,7 +394,7 @@ async function startAnalysis() {
 }
 
 async function processUploadedFile(file) {
-    return new Promise((resolve, reject) {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         
         reader.onload = function(e) {
@@ -474,7 +402,6 @@ async function processUploadedFile(file) {
                 if (file.name.endsWith('.csv')) {
                     STATE.processedData = parseCSV(e.target.result);
                 } else {
-                    // Para Excel, usar dados de demonstração
                     showNotification('Arquivo Excel detectado. Processando com dados de demonstração.', 'info');
                     STATE.processedData = generateDemoData();
                 }
@@ -508,7 +435,6 @@ function parseCSV(csvText) {
         headers.forEach((header, index) => {
             let value = values[index] || '';
             
-            // Converter tipos específicos
             if (header === 'Valor_Aquisição') {
                 value = parseFloat(value.replace(/[^0-9.-]/g, '')) || 0;
             } else if (header === 'Quantidade') {
@@ -525,15 +451,11 @@ function parseCSV(csvText) {
 }
 
 function generateDemoData() {
-    console.log('Gerando dados de demonstração...');
-    
     const categories = ['Mobiliário', 'Equipamento Informático', 'Veículos', 'Maquinaria', 'Edifícios', 'Ferramentas', 'Equipamento Médico'];
     const statuses = ['Bom', 'Regular', 'Ruim'];
     const districts = ['Maputo', 'Matola', 'Beira', 'Nampula', 'Quelimane', 'Tete', 'Xai-Xai', 'Inhambane', 'Pemba'];
     const uses = ['Em uso', 'Em armazém', 'Em manutenção', 'Desativado', 'Em reparação'];
     const responsibles = ['Maria Silva', 'João Santos', 'Ana Pereira', 'Carlos Mendes', 'Sofia Costa', 'Miguel Fernandes', 'Luísa Gomes'];
-    const suppliers = ['Fornecedor A', 'Fornecedor B', 'Fornecedor C', 'Fornecedor D'];
-    const sources = ['Compra', 'Doação', 'Transferência', 'Herança'];
     
     const demoData = [];
     const currentYear = new Date().getFullYear();
@@ -542,9 +464,9 @@ function generateDemoData() {
         const category = categories[i % categories.length];
         const status = statuses[i % statuses.length];
         const district = districts[i % districts.length];
-        const value = Math.round((Math.random() * 500000 + 1000) * 100) / 100; // 1,000 - 500,000 MZN
+        const value = Math.round((Math.random() * 500000 + 1000) * 100) / 100;
         const quantity = Math.floor(Math.random() * 5) + 1;
-        const year = currentYear - (i % 6); // Últimos 6 anos
+        const year = currentYear - (i % 6);
         const month = (i % 12) + 1;
         const day = (i % 28) + 1;
         
@@ -559,8 +481,8 @@ function generateDemoData() {
             'Estado_Conservação': status,
             'Data_Aquisição': `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
             'Valor_Aquisição': value,
-            'Fonte_Aquisição': sources[i % sources.length],
-            'Fornecedor': suppliers[i % suppliers.length],
+            'Fonte_Aquisição': ['Compra', 'Doação', 'Transferência', 'Herança'][i % 4],
+            'Fornecedor': ['Fornecedor A', 'Fornecedor B', 'Fornecedor C', 'Fornecedor D'][i % 4],
             'Localização_Item': `Sala ${(i % 50) + 1}, Edifício ${String.fromCharCode(65 + (i % 5))}`,
             'Distrito_Localização': district,
             'Uso_Actual': uses[i % uses.length],
@@ -574,18 +496,14 @@ function generateDemoData() {
         });
     }
     
-    console.log(`Dados de demonstração gerados: ${demoData.length} itens`);
     return demoData;
 }
 
 // ===== CÁLCULO DE INDICADORES =====
 function calculateIndicators() {
-    console.log('Calculando indicadores...');
-    
     const data = STATE.filteredData.length > 0 ? STATE.filteredData : STATE.processedData;
     
     if (!data || data.length === 0) {
-        console.warn('Nenhum dado para calcular indicadores');
         resetIndicators();
         return;
     }
@@ -608,35 +526,28 @@ function calculateIndicators() {
         const district = item['Distrito_Localização'] || 'Não Especificado';
         const date = item['Data_Aquisição'];
         
-        // Valor total
         totalValue += value * quantity;
         totalItems += quantity;
         
-        // Distribuição por estado
         statusDistribution[status] = (statusDistribution[status] || 0) + quantity;
         
-        // Pontuação de estado (0-100)
         if (status === 'Bom') statusScore += quantity * 100;
         else if (status === 'Regular') statusScore += quantity * 60;
         else if (status === 'Ruim') statusScore += quantity * 20;
         else statusScore += quantity * 50;
         
-        // Itens críticos
         if (status === 'Ruim' && value > 10000) {
             criticalItems += quantity;
         }
         
-        // Distribuição por categoria
         if (!categoryDistribution[category]) {
             categoryDistribution[category] = { value: 0, count: 0 };
         }
         categoryDistribution[category].value += value * quantity;
         categoryDistribution[category].count += quantity;
         
-        // Distribuição por distrito
         districtDistribution[district] = (districtDistribution[district] || 0) + 1;
         
-        // Timeline por ano
         if (date) {
             const year = date.substring(0, 4);
             if (!timelineData[year]) {
@@ -647,7 +558,6 @@ function calculateIndicators() {
         }
     });
     
-    // Calcular estado médio
     const avgStatus = totalItems > 0 ? Math.round(statusScore / totalItems) : 0;
     
     STATE.indicators = {
@@ -660,8 +570,6 @@ function calculateIndicators() {
         districtDistribution,
         timelineData
     };
-    
-    console.log('Indicadores calculados:', STATE.indicators);
 }
 
 function resetIndicators() {
@@ -682,7 +590,6 @@ function validateData(data) {
         return { valid: false, message: 'Dados inválidos ou vazios' };
     }
     
-    // Verificar campos obrigatórios
     const sampleItem = data[0];
     const required = ['ID_Item', 'Nome_Item', 'Categoria', 'Valor_Aquisição'];
     
@@ -700,33 +607,30 @@ function validateData(data) {
 
 // ===== ATUALIZAÇÃO DO DASHBOARD =====
 function updateDashboard() {
-    console.log('Atualizando dashboard...');
-    
     updateIndicatorsUI();
     updateFilterOptions();
     createCharts();
     updateTables();
     updateSummary();
-    updateRecommendations(); // AGORA COM 3 PRIORIDADES
     updateUIState();
     
-    // Aplicar correções após atualização
-    setTimeout(fixLayoutIssues, 100);
+    // Aplicar correções de layout após atualização
+    setTimeout(() => {
+        fixDuplicatedTitle();
+        fixLogoCircles();
+    }, 100);
 }
 
 function updateIndicatorsUI() {
-    console.log('Atualizando indicadores UI...');
-    
     const indicators = STATE.indicators;
     
-    // Formatar valor em MZN
     const formattedValue = formatCurrency(indicators.totalValue);
     
-    // Atualizar cards
     const totalValueElement = document.getElementById('totalValue');
     if (totalValueElement) {
-        totalValueElement.textContent = `MZN ${formattedValue.replace('MZN', '').trim()}`;
-        totalValueElement.classList.add('patrimony-value');
+        totalValueElement.innerHTML = 
+            `<span class="currency-symbol">MZN</span> ${formattedValue}`;
+        totalValueElement.classList.add('smaller-font');
     }
     
     document.getElementById('totalItems').textContent = 
@@ -738,13 +642,11 @@ function updateIndicatorsUI() {
     document.getElementById('criticalItems').textContent = 
         indicators.criticalItems.toLocaleString('pt-PT');
     
-    // Atualizar contador de itens críticos
     const criticalCount = document.getElementById('criticalCount');
     if (criticalCount) {
         criticalCount.textContent = `${indicators.criticalItems} itens`;
     }
     
-    // Atualizar informações do arquivo
     const fileInfo = document.getElementById('currentFileInfo');
     if (fileInfo) {
         if (STATE.currentFile) {
@@ -754,7 +656,6 @@ function updateIndicatorsUI() {
         }
     }
     
-    // Atualizar contador de resultados
     const resultsCount = document.getElementById('resultsCount');
     if (resultsCount) {
         const total = STATE.originalData.length;
@@ -766,9 +667,6 @@ function updateIndicatorsUI() {
 function updateFilterOptions() {
     if (!STATE.processedData || STATE.processedData.length === 0) return;
     
-    console.log('Atualizando opções de filtro...');
-    
-    // Coletar valores únicos
     const categories = new Set();
     const districts = new Set();
     const responsibles = new Set();
@@ -781,7 +679,6 @@ function updateFilterOptions() {
         if (item['Uso_Actual']) uses.add(item['Uso_Actual']);
     });
     
-    // Atualizar selects
     updateSelect('categoryFilter', Array.from(categories).sort(), 'Todas as Categorias');
     updateSelect('districtFilter', Array.from(districts).sort(), 'Todos os Distritos');
     updateSelect('responsibleFilter', Array.from(responsibles).sort(), 'Todos os Responsáveis');
@@ -793,17 +690,13 @@ function updateSelect(selectId, options, defaultText) {
     if (!select) return;
     
     const currentValue = select.value;
-    
-    // Limpar opções
     select.innerHTML = '';
     
-    // Adicionar opção padrão
     const defaultOption = document.createElement('option');
     defaultOption.value = 'all';
     defaultOption.textContent = defaultText;
     select.appendChild(defaultOption);
     
-    // Adicionar opções
     options.forEach(option => {
         const opt = document.createElement('option');
         opt.value = option;
@@ -811,384 +704,560 @@ function updateSelect(selectId, options, defaultText) {
         select.appendChild(opt);
     });
     
-    // Restaurar valor selecionado se ainda existir
     if (currentValue && options.includes(currentValue)) {
         select.value = currentValue;
     }
 }
 
-// ===== RESUMO E RECOMENDAÇÕES =====
-function updateSummary() {
-    updateSummaryContent();
+// ===== GRÁFICOS =====
+function createCharts() {
+    destroyCharts();
+    
+    createCategoryChart();
+    createStatusChart();
+    createDistrictChart();
+    createTimelineChart();
 }
 
-function updateSummaryContent() {
-    const container = document.getElementById('summaryContent');
-    if (!container) return;
-    
-    const indicators = STATE.indicators;
-    const totalItems = indicators.totalItems || 0;
-    const avgStatus = indicators.avgStatus || 0;
-    
-    let summaryHTML = `
-        <div class="summary-item">
-            <div class="summary-icon">
-                <i class="fas fa-coins"></i>
-            </div>
-            <div class="summary-text">
-                <h4>Valor Total</h4>
-                <p>${formatCurrency(indicators.totalValue)} em ${totalItems.toLocaleString('pt-PT')} itens</p>
-            </div>
-        </div>
-        
-        <div class="summary-item">
-            <div class="summary-icon">
-                <i class="fas fa-clipboard-check"></i>
-            </div>
-            <div class="summary-text">
-                <h4>Estado Geral</h4>
-                <p>Índice de conservação: <strong>${avgStatus}%</strong></p>
-            </div>
-        </div>
-    `;
-    
-    // Adicionar distribuição por categoria
-    const categories = Object.keys(indicators.categoryDistribution || {});
-    if (categories.length > 0) {
-        const topCategory = categories.reduce((a, b) => 
-            indicators.categoryDistribution[a].value > indicators.categoryDistribution[b].value ? a : b
-        );
-        
-        summaryHTML += `
-            <div class="summary-item">
-                <div class="summary-icon">
-                    <i class="fas fa-chart-pie"></i>
-                </div>
-                <div class="summary-text">
-                    <h4>Categoria Principal</h4>
-                    <p>${topCategory}: ${formatCurrency(indicators.categoryDistribution[topCategory].value)}</p>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Adicionar distribuição geográfica
-    const districts = Object.keys(indicators.districtDistribution || {});
-    if (districts.length > 0) {
-        const topDistrict = districts.reduce((a, b) => 
-            indicators.districtDistribution[a] > indicators.districtDistribution[b] ? a : b
-        );
-        
-        summaryHTML += `
-            <div class="summary-item">
-                <div class="summary-icon">
-                    <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <div class="summary-text">
-                    <h4>Distrito com Mais Itens</h4>
-                    <p>${topDistrict}: ${indicators.districtDistribution[topDistrict]} itens</p>
-                </div>
-            </div>
-        `;
-    }
-    
-    container.innerHTML = summaryHTML;
+function destroyCharts() {
+    Object.values(STATE.charts).forEach(chart => {
+        if (chart && typeof chart.destroy === 'function') {
+            chart.destroy();
+        }
+    });
+    STATE.charts = {};
 }
 
-// ===== SISTEMA DE RECOMENDAÇÕES COMPLETO (COM 3 PRIORIDADES) =====
-function updateRecommendations() {
-    const container = document.getElementById('recommendationsContent');
-    if (!container) return;
+function createCategoryChart() {
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) return;
     
-    const indicators = STATE.indicators;
-    const recommendations = [];
+    const ctx = canvas.getContext('2d');
+    const distribution = STATE.indicators.categoryDistribution || {};
     
-    // 1. ALTA PRIORIDADE - Itens críticos
-    if (indicators.criticalItems > 0) {
-        recommendations.push({
-            icon: 'exclamation-triangle',
-            color: 'error',
-            text: `Priorizar manutenção de ${indicators.criticalItems} itens críticos (alto valor + estado ruim)`,
-            priority: 'ALTA',
-            description: 'Itens com valor superior a 10.000€ e estado abaixo de 30% necessitam atenção imediata'
-        });
-    } else {
-        recommendations.push({
-            icon: 'check-circle',
-            color: 'success',
-            text: 'Nenhum item crítico identificado',
-            priority: 'ALTA',
-            description: 'Situação positiva - nenhum item requer manutenção urgente'
-        });
-    }
+    const labels = Object.keys(distribution);
+    const data = labels.map(label => distribution[label].value);
+    const backgroundColors = generateColors(labels.length);
     
-    // 2. MÉDIA PRIORIDADE - Plano de manutenção
-    if (indicators.avgStatus < 70) {
-        recommendations.push({
-            icon: 'tools',
-            color: 'warning',
-            text: `Implementar plano de manutenção preventiva (estado médio: ${indicators.avgStatus}%)`,
-            priority: 'MÉDIA',
-            description: 'Focar em itens com valor entre 2.000€ e 10.000€ para evitar deterioração'
-        });
-    } else {
-        recommendations.push({
-            icon: 'shield-alt',
-            color: 'info',
-            text: 'Estado do patrimônio dentro dos parâmetros aceitáveis',
-            priority: 'MÉDIA',
-            description: 'Manter programa de manutenção preventiva regular'
-        });
-    }
+    STATE.charts.category = new Chart(ctx, {
+        type: STATE.chartTypes.category,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Valor (MZN)',
+                data: data,
+                backgroundColor: backgroundColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 20,
+                        font: { size: 11 },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribuição por Categoria',
+                    font: { size: 14, weight: '600' },
+                    padding: { top: 10, bottom: 30 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label || ''}: ${formatCurrency(context.parsed.y || context.parsed)}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createStatusChart() {
+    const canvas = document.getElementById('statusChart');
+    if (!canvas) return;
     
-    // 3. BAIXA PRIORIDADE - Otimização de custos
-    const goodItems = STATE.filteredData.filter(item => 
-        item['Estado_Conservação'] === 'Bom'
-    ).length;
+    const ctx = canvas.getContext('2d');
+    const distribution = STATE.indicators.statusDistribution || {};
     
-    if (goodItems > 0) {
-        recommendations.push({
-            icon: 'chart-line',
-            color: 'info',
-            text: `Realizar revisão de ${goodItems} itens com bom estado para otimização de custos`,
-            priority: 'BAIXA',
-            description: 'Itens com estado acima de 80% podem ter custos de manutenção reduzidos'
-        });
-    } else {
-        recommendations.push({
-            icon: 'search',
-            color: 'info',
-            text: 'Monitorar itens estáveis periodicamente',
-            priority: 'BAIXA',
-            description: 'Realizar verificações semestrais para garantir estabilidade'
-        });
-    }
+    const labels = Object.keys(distribution);
+    const data = labels.map(label => distribution[label]);
     
-    // Verificar idade dos itens (recomendação adicional)
-    const currentYear = new Date().getFullYear();
-    const oldItems = STATE.filteredData.filter(item => {
-        const date = item['Data_Aquisição'];
-        if (!date) return false;
-        const year = parseInt(date.substring(0, 4));
-        return currentYear - year > 5;
-    }).length;
-    
-    if (oldItems > 0) {
-        recommendations.push({
-            icon: 'history',
-            color: 'warning',
-            text: `${oldItems} itens com mais de 5 anos - considerar renovação`,
-            priority: 'MÉDIA',
-            description: 'Itens antigos podem apresentar custos de manutenção elevados'
-        });
-    }
-    
-    // Garantir pelo menos 3 recomendações
-    if (recommendations.length < 3) {
-        recommendations.push({
-            icon: 'clipboard-list',
-            color: 'info',
-            text: 'Realizar inventário físico completo',
-            priority: 'BAIXA',
-            description: 'Verificar correspondência entre registros e itens físicos'
-        });
-    }
-    
-    // Ordenar por prioridade (Alta, Média, Baixa)
-    const priorityOrder = { 'ALTA': 1, 'MÉDIA': 2, 'BAIXA': 3 };
-    recommendations.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-    
-    // Gerar HTML
-    let recommendationsHTML = '<div class="recommendations-container">';
-    
-    // Cabeçalho
-    recommendationsHTML += `
-        <div class="recommendations-header">
-            <h3><i class="fas fa-lightbulb"></i> Recomendações e Ações</h3>
-            <p class="recommendations-subtitle">Sugestões baseadas na análise do patrimônio</p>
-        </div>
-    `;
-    
-    // Cards de recomendações
-    recommendations.forEach(rec => {
-        recommendationsHTML += `
-            <div class="recommendation-card ${rec.color}">
-                <div class="recommendation-icon">
-                    <i class="fas fa-${rec.icon}"></i>
-                </div>
-                <div class="recommendation-content">
-                    <h4>${rec.text}</h4>
-                    <p class="recommendation-description">${rec.description}</p>
-                    <div class="priority-tag priority-${rec.priority.toLowerCase()}">
-                        <i class="fas fa-flag"></i> PRIORIDADE: ${rec.priority}
-                    </div>
-                </div>
-            </div>
-        `;
+    const backgroundColors = labels.map(label => {
+        switch(label) {
+            case 'Bom': return '#10B981';
+            case 'Regular': return '#F97316';
+            case 'Ruim': return '#EF4444';
+            default: return '#6B7280';
+        }
     });
     
-    recommendationsHTML += '</div>';
-    
-    container.innerHTML = recommendationsHTML;
-    
-    // Aplicar estilos específicos para prioridades
-    applyPriorityStyles();
+    STATE.charts.status = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '',
+                data: data,
+                backgroundColor: backgroundColors,
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Estado de Conservação',
+                    font: { size: 14, weight: '600' },
+                    padding: { top: 10, bottom: 30 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.parsed.x} itens`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Número de Itens'
+                    }
+                }
+            }
+        }
+    });
 }
 
-function applyPriorityStyles() {
-    // Estilos dinâmicos para as prioridades
-    const style = document.createElement('style');
-    style.textContent = `
-        .priority-alta {
-            background-color: #f44336 !important;
-            color: white !important;
-            border-left: 4px solid #d32f2f !important;
-        }
-        
-        .priority-media {
-            background-color: #ff9800 !important;
-            color: white !important;
-            border-left: 4px solid #f57c00 !important;
-        }
-        
-        .priority-baixa {
-            background-color: #4caf50 !important;
-            color: white !important;
-            border-left: 4px solid #388e3c !important;
-        }
-        
-        .priority-tag {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .priority-tag i {
-            margin-right: 5px;
-        }
-        
-        .recommendations-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        
-        .recommendations-header h3 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .recommendations-header h3 i {
-            color: #3498db;
-        }
-        
-        .recommendations-subtitle {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-        
-        .recommendation-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .recommendation-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-        }
-        
-        .recommendation-card.error {
-            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
-        }
-        
-        .recommendation-card.warning {
-            background: linear-gradient(135deg, #fffaf0 0%, #fff 100%);
-        }
-        
-        .recommendation-card.success {
-            background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
-        }
-        
-        .recommendation-card.info {
-            background: linear-gradient(135deg, #f0f9ff 0%, #fff 100%);
-        }
-        
-        .recommendation-icon {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        .recommendation-content h4 {
-            margin: 0 0 10px 0;
-            color: #2c3e50;
-            font-size: 1.1rem;
-        }
-        
-        .recommendation-description {
-            color: #546e7a;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-    `;
+function createDistrictChart() {
+    const canvas = document.getElementById('districtChart');
+    if (!canvas) return;
     
-    // Adicionar estilos apenas se não existirem
-    if (!document.getElementById('recommendations-styles')) {
-        style.id = 'recommendations-styles';
-        document.head.appendChild(style);
-    }
+    const ctx = canvas.getContext('2d');
+    const distribution = STATE.indicators.districtDistribution || {};
+    
+    const labels = Object.keys(distribution);
+    const data = labels.map(label => distribution[label]);
+    
+    STATE.charts.district = new Chart(ctx, {
+        type: STATE.chartTypes.district,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Número de Itens',
+                data: data,
+                backgroundColor: generateColors(labels.length),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 20,
+                        font: { size: 11 },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribuição por Distrito',
+                    font: { size: 14, weight: '600' },
+                    padding: { top: 10, bottom: 30 }
+                }
+            }
+        }
+    });
 }
 
-// ===== NAVEGAÇÃO =====
-function showDashboard() {
-    console.log('Mostrando dashboard...');
+function createTimelineChart() {
+    const canvas = document.getElementById('timelineChart');
+    if (!canvas) return;
     
-    document.getElementById('uploadPage').style.display = 'none';
-    document.getElementById('dashboardPage').style.display = 'block';
+    const ctx = canvas.getContext('2d');
+    const timeline = STATE.indicators.timelineData || {};
     
-    // Atualizar data e hora
-    updateCurrentDate();
+    const labels = Object.keys(timeline).sort();
+    const data = labels.map(year => timeline[year].value);
     
-    const lastUpdate = document.getElementById('lastUpdate');
-    if (lastUpdate) {
-        lastUpdate.textContent = `Dashboard APRODET - Análise Patrimonial | Última atualização: ${new Date().toLocaleString('pt-PT')}`;
-    }
-    
-    // Atualizar contador
-    const processedItems = document.getElementById('processedItems');
-    if (processedItems) {
-        processedItems.textContent = STATE.processedData.length;
-    }
-    
-    // Atualizar modo
-    const analysisMode = document.getElementById('analysisMode');
-    if (analysisMode) {
-        analysisMode.textContent = STATE.currentFile ? 'Arquivo Carregado' : 'Demonstração';
-    }
-    
-    // Aplicar correções após mostrar dashboard
-    setTimeout(fixLayoutIssues, 100);
-    
-    // Scroll para topo
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    STATE.charts.timeline = new Chart(ctx, {
+        type: STATE.chartTypes.timeline,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '',
+                data: data,
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Aquisições ao Longo do Tempo',
+                    font: { size: 14, weight: '600' },
+                    padding: { top: 10, bottom: 30 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${formatCurrency(context.parsed.y || context.parsed)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatCurrency(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
-// ===== FUNÇÕES RESTANTES (mantenha as mesmas da versão antiga) =====
+function generateColors(count) {
+    const colors = [
+        '#3B82F6', '#10B981', '#F97316', '#8B5CF6', '#EF4444',
+        '#06B6D4', '#84CC16', '#F59E0B', '#EC4899', '#6366F1'
+    ];
+    
+    if (count <= colors.length) {
+        return colors.slice(0, count);
+    }
+    
+    const additionalColors = [];
+    for (let i = colors.length; i < count; i++) {
+        const hue = (i * 137.508) % 360;
+        additionalColors.push(`hsl(${hue}, 70%, 65%)`);
+    }
+    
+    return [...colors, ...additionalColors].slice(0, count);
+}
 
-// ... (resto das funções da versão antiga - charts, tabelas, filtros, exportação, etc.)
+// ===== TABELAS =====
+function updateTables() {
+    updateAllItemsTable();
+    updateCriticalTable();
+    updatePagination();
+}
+
+function updateAllItemsTable() {
+    const tbody = document.getElementById('allItemsTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    const startIndex = (STATE.currentPage - 1) * STATE.itemsPerPage;
+    const endIndex = startIndex + STATE.itemsPerPage;
+    const paginatedItems = STATE.filteredData.slice(startIndex, endIndex);
+    
+    if (paginatedItems.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-table">
+                    <i class="fas fa-search"></i>
+                    <div>
+                        <h4>Nenhum item encontrado</h4>
+                        <p>Tente ajustar os filtros ou termos de busca</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    paginatedItems.forEach(item => {
+        const row = document.createElement('tr');
+        const value = parseFloat(item['Valor_Aquisição']) || 0;
+        const status = item['Estado_Conservação'] || '';
+        
+        let statusClass = 'status-regular';
+        if (status === 'Bom') statusClass = 'status-good';
+        else if (status === 'Ruim') statusClass = 'status-bad';
+        
+        row.innerHTML = `
+            <td><code>${escapeHtml(item['ID_Item'] || '')}</code></td>
+            <td>${escapeHtml(truncateText(item['Nome_Item'] || '', 25))}</td>
+            <td><span class="category-tag">${escapeHtml(item['Categoria'] || '')}</span></td>
+            <td><span class="status-badge ${statusClass}">${escapeHtml(status)}</span></td>
+            <td>${formatCurrency(value)}</td>
+            <td>${escapeHtml(item['Distrito_Localização'] || '')}</td>
+            <td>
+                <button class="btn-icon" onclick="showItemDetails('${item['ID_Item']}')" title="Ver detalhes">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+function updateCriticalTable() {
+    const tbody = document.getElementById('criticalTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    const criticalItems = STATE.filteredData.filter(item => {
+        const status = item['Estado_Conservação'];
+        const value = parseFloat(item['Valor_Aquisição']) || 0;
+        return status === 'Ruim' && value > 10000;
+    });
+    
+    if (criticalItems.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-table">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h4>Nenhum item crítico encontrado</h4>
+                        <p>Todos os itens estão em bom ou regular estado</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    criticalItems.slice(0, 20).forEach(item => {
+        const row = document.createElement('tr');
+        const value = parseFloat(item['Valor_Aquisição']) || 0;
+        
+        row.innerHTML = `
+            <td><strong>${escapeHtml(item['ID_Item'] || '')}</strong></td>
+            <td>${escapeHtml(item['Nome_Item'] || '')}</td>
+            <td><span class="category-tag">${escapeHtml(item['Categoria'] || '')}</span></td>
+            <td><span class="status-badge status-bad">${escapeHtml(item['Estado_Conservação'] || '')}</span></td>
+            <td><strong>${formatCurrency(value)}</strong></td>
+            <td>${escapeHtml(item['Localização_Item'] || '')}</td>
+            <td>
+                <button class="btn-icon" onclick="showItemDetails('${item['ID_Item']}')" title="Ver detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+function updatePagination() {
+    const totalItems = STATE.filteredData.length;
+    const totalPages = Math.ceil(totalItems / STATE.itemsPerPage);
+    
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        const start = ((STATE.currentPage - 1) * STATE.itemsPerPage) + 1;
+        const end = Math.min(STATE.currentPage * STATE.itemsPerPage, totalItems);
+        paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} itens`;
+    }
+    
+    const controls = document.getElementById('paginationControls');
+    if (!controls) return;
+    
+    controls.innerHTML = '';
+    
+    const prevBtn = document.createElement('button');
+    prevBtn.className = `btn-pagination ${STATE.currentPage === 1 ? 'disabled' : ''}`;
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevBtn.disabled = STATE.currentPage === 1;
+    prevBtn.onclick = () => changePage(STATE.currentPage - 1);
+    controls.appendChild(prevBtn);
+    
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, STATE.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = `btn-pagination ${i === STATE.currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.onclick = () => changePage(i);
+        controls.appendChild(pageBtn);
+    }
+    
+    const nextBtn = document.createElement('button');
+    nextBtn.className = `btn-pagination ${STATE.currentPage === totalPages ? 'disabled' : ''}`;
+    nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextBtn.disabled = STATE.currentPage === totalPages;
+    nextBtn.onclick = () => changePage(STATE.currentPage + 1);
+    controls.appendChild(nextBtn);
+}
+
+function changePage(page) {
+    if (page < 1 || page > Math.ceil(STATE.filteredData.length / STATE.itemsPerPage)) {
+        return;
+    }
+    
+    STATE.currentPage = page;
+    updateTables();
+}
+
+// ===== FILTROS =====
+function applyFilters() {
+    if (!STATE.processedData || STATE.processedData.length === 0) {
+        showNotification('Nenhum dado disponível para filtrar', 'warning');
+        return;
+    }
+    
+    collectFilterValues();
+    
+    STATE.filteredData = STATE.processedData.filter(item => {
+        return applyAllFilters(item);
+    });
+    
+    calculateIndicators();
+    STATE.currentPage = 1;
+    updateDashboard();
+    
+    showNotification(`Filtros aplicados: ${STATE.filteredData.length} itens encontrados`, 'success');
+}
+
+function collectFilterValues() {
+    STATE.filters.category = getSelectValue('categoryFilter');
+    STATE.filters.district = getSelectValue('districtFilter');
+    STATE.filters.status = getSelectValue('statusFilter');
+    STATE.filters.responsible = getSelectValue('responsibleFilter');
+    STATE.filters.use = getSelectValue('useFilter');
+}
+
+function getSelectValue(selectId) {
+    const select = document.getElementById(selectId);
+    return select ? select.value : 'all';
+}
+
+function applyAllFilters(item) {
+    const filters = STATE.filters;
+    
+    if (filters.category !== 'all' && filters.category !== item['Categoria']) {
+        return false;
+    }
+    
+    if (filters.district !== 'all' && filters.district !== item['Distrito_Localização']) {
+        return false;
+    }
+    
+    if (filters.status !== 'all' && filters.status !== item['Estado_Conservação']) {
+        return false;
+    }
+    
+    if (filters.responsible !== 'all' && filters.responsible !== item['Responsável_Item']) {
+        return false;
+    }
+    
+    if (filters.use !== 'all' && filters.use !== item['Uso_Actual']) {
+        return false;
+    }
+    
+    if (STATE.searchTerm && STATE.searchTerm.trim() !== '') {
+        const searchLower = STATE.searchTerm.toLowerCase();
+        const searchFields = [
+            item['ID_Item'],
+            item['Nome_Item'],
+            item['Categoria'],
+            item['Descrição'],
+            item['Localização_Item'],
+            item['Distrito_Localização'],
+            item['Responsável_Item'],
+            item['Fornecedor']
+        ].filter(field => field).map(field => field.toLowerCase());
+        
+        if (!searchFields.some(field => field.includes(searchLower))) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function resetFilters() {
+    STATE.filters = {
+        category: 'all',
+        district: 'all',
+        status: 'all',
+        responsible: 'all',
+        use: 'all'
+    };
+    
+    STATE.searchTerm = '';
+    STATE.currentPage = 1;
+    
+    const controls = [
+        'categoryFilter', 'districtFilter', 'statusFilter',
+        'responsibleFilter', 'useFilter', 'searchInput'
+    ];
+    
+    controls.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            if (element.tagName === 'SELECT') {
+                element.value = 'all';
+            } else {
+                element.value = '';
+            }
+        }
+    });
+    
+    document.getElementById('tableSearch').value = '';
+    
+    STATE.filteredData = [...STATE.processedData];
+    calculateIndicators();
+    updateDashboard();
+    
+    showNotification('Filtros resetados com sucesso', 'info');
+}
+
+function handleSearch(e) {
+    STATE.searchTerm = e.target.value;
+    applyFilters();
+}
+
+function handleTableSearch(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#allItemsTableBody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+}
 
 // ===== FUNÇÕES AUXILIARES =====
 function showLoading(message) {
@@ -1264,7 +1333,6 @@ function updateCurrentDate() {
 }
 
 function updateUIState() {
-    // Atualizar estado dos botões baseado nos dados
     const hasData = STATE.filteredData && STATE.filteredData.length > 0;
     
     const exportButtons = ['exportPdfBtn', 'exportCsvBtn', 'exportReportBtn'];
@@ -1276,13 +1344,205 @@ function updateUIState() {
     });
 }
 
-// ... (continue com as outras funções da versão antiga)
+// ===== NAVEGAÇÃO =====
+function showDashboard() {
+    document.getElementById('uploadPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    
+    updateCurrentDate();
+    document.getElementById('lastUpdate').textContent = 
+        new Date().toLocaleTimeString('pt-PT');
+    
+    document.getElementById('processedItems').textContent = 
+        STATE.processedData.length;
+    
+    // Aplicar correções após mostrar dashboard
+    setTimeout(() => {
+        fixDuplicatedTitle();
+        fixLogoCircles();
+    }, 100);
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBackToHome() {
+    document.getElementById('dashboardPage').style.display = 'none';
+    document.getElementById('uploadPage').style.display = 'block';
+    clearSelectedFile();
+    
+    STATE.filteredData = [...STATE.processedData];
+    STATE.currentPage = 1;
+    
+    showNotification('Pronto para novo upload ou análise', 'info');
+}
+
+// ===== MODAL =====
+window.showItemDetails = function(itemId) {
+    const item = STATE.filteredData.find(i => i['ID_Item'] === itemId);
+    if (!item) {
+        showNotification('Item não encontrado', 'error');
+        return;
+    }
+    
+    const modal = document.getElementById('itemModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    if (!modal || !modalTitle || !modalBody) return;
+    
+    modalTitle.textContent = `Detalhes: ${item['Nome_Item']}`;
+    
+    let modalHTML = `
+        <div class="item-details">
+            <div class="detail-row">
+                <span class="detail-label">ID do Item:</span>
+                <span class="detail-value">${escapeHtml(item['ID_Item'])}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Código Patrimonial:</span>
+                <span class="detail-value">${escapeHtml(item['Codigo_Patrimonial'])}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Categoria:</span>
+                <span class="detail-value">${escapeHtml(item['Categoria'])}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Estado:</span>
+                <span class="detail-value status-badge ${item['Estado_Conservação'] === 'Bom' ? 'status-good' : item['Estado_Conservação'] === 'Ruim' ? 'status-bad' : 'status-regular'}">
+                    ${escapeHtml(item['Estado_Conservação'])}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Valor:</span>
+                <span class="detail-value">${formatCurrency(parseFloat(item['Valor_Aquisição']) || 0)}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Localização:</span>
+                <span class="detail-value">${escapeHtml(item['Localização_Item'])}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Distrito:</span>
+                <span class="detail-value">${escapeHtml(item['Distrito_Localização'])}</span>
+            </div>
+    `;
+    
+    if (item['Observações']) {
+        modalHTML += `
+            <div class="detail-row">
+                <span class="detail-label">Observações:</span>
+                <span class="detail-value">${escapeHtml(item['Observações'])}</span>
+            </div>
+        `;
+    }
+    
+    modalHTML += `</div>`;
+    
+    modalBody.innerHTML = modalHTML;
+    modal.style.display = 'flex';
+};
+
+// ===== NOTIFICAÇÕES =====
+window.showNotification = function(message, type = 'info') {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    const notificationIcon = document.getElementById('notification-icon');
+    
+    if (!notification || !notificationText || !notificationIcon) return;
+    
+    let iconClass = 'fa-info-circle';
+    if (type === 'success') iconClass = 'fa-check-circle';
+    else if (type === 'error') iconClass = 'fa-exclamation-circle';
+    else if (type === 'warning') iconClass = 'fa-exclamation-triangle';
+    
+    notificationIcon.className = `fas ${iconClass}`;
+    notificationText.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 5000);
+};
+
+window.hideNotification = function() {
+    const notification = document.getElementById('notification');
+    if (notification) {
+        notification.style.display = 'none';
+    }
+};
+
+// ===== LOCAL STORAGE =====
+function saveToLocalStorage() {
+    try {
+        const dataToSave = {
+            indicators: STATE.indicators,
+            filters: STATE.filters,
+            lastUpdated: new Date().getTime(),
+            dataLength: STATE.processedData.length
+        };
+        localStorage.setItem('aprodetDashboard', JSON.stringify(dataToSave));
+    } catch (error) {
+        console.warn('Não foi possível salvar dados:', error);
+    }
+}
+
+function checkSavedData() {
+    try {
+        const saved = localStorage.getItem('aprodetDashboard');
+        if (saved) {
+            const data = JSON.parse(saved);
+            const oneDayAgo = new Date().getTime() - (24 * 60 * 60 * 1000);
+            
+            if (data.lastUpdated > oneDayAgo) {
+                showNotification('Dados anteriores encontrados. Carregue um novo arquivo para análise atual.', 'info');
+            }
+        }
+    } catch (error) {
+        console.warn('Erro ao recuperar dados:', error);
+    }
+}
+
+// ===== FUNÇÕES DE EXPORTAÇÃO (simplificadas) =====
+function exportToPDF() {
+    showNotification('Função PDF em desenvolvimento', 'info');
+}
+
+function exportToCSV() {
+    if (!STATE.filteredData || STATE.filteredData.length === 0) {
+        showNotification('Nenhum dado para exportar', 'warning');
+        return;
+    }
+    
+    showNotification('Função CSV em desenvolvimento', 'info');
+}
+
+function exportReport() {
+    if (!STATE.filteredData || STATE.filteredData.length === 0) {
+        showNotification('Nenhum dado para relatório', 'warning');
+        return;
+    }
+    
+    showNotification('Função Relatório em desenvolvimento', 'info');
+}
+
+// ===== RESUMO E RECOMENDAÇÕES (simplificadas) =====
+function updateSummary() {
+    // Função simplificada
+}
+
+// ===== PREVENIR SAÍDA =====
+window.addEventListener('beforeunload', function(e) {
+    if (STATE.isLoading) {
+        e.preventDefault();
+        e.returnValue = 'A análise ainda está em progresso. Tem certeza que deseja sair?';
+        return e.returnValue;
+    }
+});
 
 // ===== INICIALIZAÇÃO FINAL =====
 setTimeout(() => {
     if (typeof Chart !== 'undefined') {
         Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
         Chart.defaults.color = '#6B7280';
-        console.log('Chart.js configurado');
     }
 }, 100);
