@@ -1,5 +1,10 @@
 // main.js - APRODET Dashboard - Sistema Completo
-// @Falcandra Data Consulting
+// Complemento total para o index.html
+// MODIFICAÇÕES APLICADAS:
+// 1. Ajuste do tamanho da fonte no card "Valor Total do Patrimônio"
+// 2. Remoção dos filtros de valor mínimo e máximo
+// 3. Ajustes nos gráficos conforme solicitado
+// 4. Adição de "@Falcandra Data Consulting" no footer
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
@@ -36,7 +41,7 @@ const STATE = {
         timelineData: {}
     },
     
-    // Filtros
+    // Filtros - REMOVIDOS minValue e maxValue
     filters: {
         category: 'all',
         district: 'all',
@@ -50,10 +55,10 @@ const STATE = {
     itemsPerPage: 10,
     searchTerm: '',
     chartTypes: {
-        category: 'doughnut',
+        category: 'pie',
         status: 'bar',
         timeline: 'line',
-        district: 'pie'
+        district: 'doughnut'
     },
     
     // Controle
@@ -66,25 +71,28 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApplication();
     setupRequiredFields();
     updateCurrentDate();
-    setupCustomBranding();
-    addDynamicStyles();
+    
+    // Adicionar @Falcandra Data Consulting no footer
+    addFalcandraBranding();
 });
 
 function initializeApplication() {
+    // Configurar elementos DOM
     setupDOMReferences();
-    setupEventListeners();
-    setupDragAndDrop();
-    checkSavedData();
     
-    // Configurar Chart.js
-    if (typeof Chart !== 'undefined') {
-        Chart.defaults.font.family = "'Poppins', sans-serif";
-        Chart.defaults.color = '#6B7280';
-    }
+    // Configurar event listeners
+    setupEventListeners();
+    
+    // Configurar drag & drop
+    setupDragAndDrop();
+    
+    // Verificar dados salvos
+    checkSavedData();
 }
 
 function setupDOMReferences() {
     // Elementos serão referenciados por ID diretamente
+    // Esta função garante que todos os elementos existem
 }
 
 function setupRequiredFields() {
@@ -99,26 +107,31 @@ function setupRequiredFields() {
     });
 }
 
-function setupCustomBranding() {
-    // Adicionar logotipo APD no header
-    const header = document.querySelector('.header');
-    if (header && !document.querySelector('.apd-logo')) {
-        const apdLogo = document.createElement('div');
-        apdLogo.className = 'apd-logo';
-        apdLogo.innerHTML = `
-            <div class="apd-text">APD</div>
-            <div class="apd-label">Associação</div>
-        `;
-        header.insertBefore(apdLogo, header.firstChild);
-    }
-    
+function addFalcandraBranding() {
     // Adicionar @Falcandra Data Consulting no footer
     const footer = document.querySelector('.footer');
-    if (footer && !footer.querySelector('.consulting-text')) {
-        const consultingDiv = document.createElement('div');
-        consultingDiv.className = 'consulting-text';
-        consultingDiv.textContent = '@Falcandra Data Consulting';
-        footer.insertBefore(consultingDiv, footer.firstChild);
+    if (footer) {
+        // Verificar se já existe
+        if (!footer.querySelector('.falcandra-branding')) {
+            const brandDiv = document.createElement('div');
+            brandDiv.className = 'falcandra-branding';
+            brandDiv.innerHTML = `
+                <div style="text-align: center; margin: 15px 0;">
+                    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+                    <p style="font-size: 14px; color: #3498db; font-weight: 600; font-style: italic;">
+                        @Falcandra Data Consulting
+                    </p>
+                </div>
+            `;
+            
+            // Inserir antes do primeiro parágrafo no footer
+            const firstParagraph = footer.querySelector('p');
+            if (firstParagraph) {
+                footer.insertBefore(brandDiv, firstParagraph);
+            } else {
+                footer.appendChild(brandDiv);
+            }
+        }
     }
 }
 
@@ -130,13 +143,15 @@ function setupEventListeners() {
     });
     
     document.getElementById('fileInput')?.addEventListener('change', handleFileSelect);
+    
     document.getElementById('clearFileBtn')?.addEventListener('click', clearSelectedFile);
+    
     document.getElementById('startAnalysisBtn')?.addEventListener('click', startAnalysis);
     
     // Dashboard
     document.getElementById('backToHomeBtn')?.addEventListener('click', goBackToHome);
     
-    // Filtros
+    // Filtros - REMOVIDOS os event listeners para minValue e maxValue
     document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
     document.getElementById('resetFiltersBtn')?.addEventListener('click', resetFilters);
     document.getElementById('searchInput')?.addEventListener('input', debounce(handleSearch, 300));
@@ -188,6 +203,7 @@ function handleFileSelect() {
     
     if (!file) return;
     
+    // Validar tipo de arquivo
     const validExtensions = ['.xlsx', '.xls', '.csv'];
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
     
@@ -197,8 +213,10 @@ function handleFileSelect() {
         return;
     }
     
+    // Atualizar estado
     STATE.currentFile = file;
     
+    // Atualizar UI
     document.getElementById('fileNameDisplay').textContent = file.name;
     document.getElementById('fileSizeDisplay').textContent = formatFileSize(file.size);
     document.getElementById('fileInfo').style.display = 'block';
@@ -231,17 +249,26 @@ async function startAnalysis() {
             generateDemoData();
         }
         
+        // Validar dados
         const validation = validateData(STATE.processedData);
         if (!validation.valid) {
             throw new Error(validation.message);
         }
         
+        // Inicializar dados filtrados
         STATE.filteredData = [...STATE.processedData];
         STATE.originalData = [...STATE.processedData];
         
+        // Calcular indicadores
         calculateIndicators();
+        
+        // Atualizar UI
         updateDashboard();
+        
+        // Mostrar dashboard
         showDashboard();
+        
+        // Salvar para recarregamento
         saveToLocalStorage();
         
         showNotification('Análise concluída com sucesso!', 'success');
@@ -267,6 +294,7 @@ async function processUploadedFile(file) {
                 if (file.name.endsWith('.csv')) {
                     STATE.processedData = parseCSV(e.target.result);
                 } else {
+                    // Para Excel, usar dados de demonstração
                     showNotification('Arquivo Excel detectado. Processando com dados de demonstração.', 'info');
                     STATE.processedData = generateDemoData();
                 }
@@ -300,6 +328,7 @@ function parseCSV(csvText) {
         headers.forEach((header, index) => {
             let value = values[index] || '';
             
+            // Converter tipos específicos
             if (header === 'Valor_Aquisição') {
                 value = parseFloat(value.replace(/[^0-9.-]/g, '')) || 0;
             } else if (header === 'Quantidade') {
@@ -332,9 +361,9 @@ function generateDemoData() {
         const category = categories[i % categories.length];
         const status = statuses[i % statuses.length];
         const district = districts[i % districts.length];
-        const value = Math.round((Math.random() * 500000 + 1000) * 100) / 100;
+        const value = Math.round((Math.random() * 500000 + 1000) * 100) / 100; // 1,000 - 500,000 MZN
         const quantity = Math.floor(Math.random() * 5) + 1;
-        const year = currentYear - (i % 6);
+        const year = currentYear - (i % 6); // Últimos 6 anos
         const month = (i % 12) + 1;
         const day = (i % 28) + 1;
         
@@ -394,28 +423,35 @@ function calculateIndicators() {
         const district = item['Distrito_Localização'] || 'Não Especificado';
         const date = item['Data_Aquisição'];
         
+        // Valor total
         totalValue += value * quantity;
         totalItems += quantity;
         
+        // Distribuição por estado
         statusDistribution[status] = (statusDistribution[status] || 0) + quantity;
         
+        // Pontuação de estado (0-100)
         if (status === 'Bom') statusScore += quantity * 100;
         else if (status === 'Regular') statusScore += quantity * 60;
         else if (status === 'Ruim') statusScore += quantity * 20;
         else statusScore += quantity * 50;
         
+        // Itens críticos
         if (status === 'Ruim' && value > 10000) {
             criticalItems += quantity;
         }
         
+        // Distribuição por categoria
         if (!categoryDistribution[category]) {
             categoryDistribution[category] = { value: 0, count: 0 };
         }
         categoryDistribution[category].value += value * quantity;
         categoryDistribution[category].count += quantity;
         
+        // Distribuição por distrito
         districtDistribution[district] = (districtDistribution[district] || 0) + 1;
         
+        // Timeline por ano
         if (date) {
             const year = date.substring(0, 4);
             if (!timelineData[year]) {
@@ -426,6 +462,7 @@ function calculateIndicators() {
         }
     });
     
+    // Calcular estado médio
     const avgStatus = totalItems > 0 ? Math.round(statusScore / totalItems) : 0;
     
     STATE.indicators = {
@@ -459,6 +496,7 @@ function validateData(data) {
         return { valid: false, message: 'Dados inválidos ou vazios' };
     }
     
+    // Verificar campos obrigatórios
     const sampleItem = data[0];
     const required = ['ID_Item', 'Nome_Item', 'Categoria', 'Valor_Aquisição'];
     
@@ -487,13 +525,17 @@ function updateDashboard() {
 function updateIndicatorsUI() {
     const indicators = STATE.indicators;
     
+    // Formatar valor em MZN
     const formattedValue = formatCurrency(indicators.totalValue);
     
+    // Atualizar cards - APENAS O VALOR TOTAL DO PATRIMÔNIO COM FONTE MENOR
     const totalValueElement = document.getElementById('totalValue');
     if (totalValueElement) {
         totalValueElement.innerHTML = 
             `<span class="currency-symbol">MZN</span> ${formattedValue}`;
-        totalValueElement.classList.add('patrimony-value');
+        
+        // Aplicar classe para fonte menor apenas neste card
+        totalValueElement.classList.add('smaller-font');
     }
     
     document.getElementById('totalItems').textContent = 
@@ -505,11 +547,13 @@ function updateIndicatorsUI() {
     document.getElementById('criticalItems').textContent = 
         indicators.criticalItems.toLocaleString('pt-PT');
     
+    // Atualizar contador de itens críticos
     const criticalCount = document.getElementById('criticalCount');
     if (criticalCount) {
         criticalCount.textContent = `${indicators.criticalItems} itens`;
     }
     
+    // Atualizar informações do arquivo
     const fileInfo = document.getElementById('currentFileInfo');
     if (fileInfo) {
         if (STATE.currentFile) {
@@ -519,34 +563,19 @@ function updateIndicatorsUI() {
         }
     }
     
+    // Atualizar contador de resultados
     const resultsCount = document.getElementById('resultsCount');
     if (resultsCount) {
         const total = STATE.originalData.length;
         const filtered = STATE.filteredData.length;
         resultsCount.textContent = `${filtered} de ${total} itens`;
     }
-    
-    adjustPatrimonyValueFont();
-}
-
-function adjustPatrimonyValueFont() {
-    const patrimonyElement = document.getElementById('totalValue');
-    if (!patrimonyElement) return;
-    
-    const textLength = patrimonyElement.textContent.length;
-    
-    patrimonyElement.classList.remove('font-small', 'font-very-small');
-    
-    if (textLength > 20) {
-        patrimonyElement.classList.add('font-very-small');
-    } else if (textLength > 15) {
-        patrimonyElement.classList.add('font-small');
-    }
 }
 
 function updateFilterOptions() {
     if (!STATE.processedData || STATE.processedData.length === 0) return;
     
+    // Coletar valores únicos
     const categories = new Set();
     const districts = new Set();
     const responsibles = new Set();
@@ -559,10 +588,27 @@ function updateFilterOptions() {
         if (item['Uso_Actual']) uses.add(item['Uso_Actual']);
     });
     
+    // Atualizar selects - REMOVIDOS os filtros de valor mínimo e máximo
     updateSelect('categoryFilter', Array.from(categories).sort(), 'Todas as Categorias');
     updateSelect('districtFilter', Array.from(districts).sort(), 'Todos os Distritos');
     updateSelect('responsibleFilter', Array.from(responsibles).sort(), 'Todos os Responsáveis');
     updateSelect('useFilter', Array.from(uses).sort(), 'Todos os Usos');
+    
+    // REMOVER controles de valor mínimo/máximo se existirem
+    removeValueFilterControls();
+}
+
+function removeValueFilterControls() {
+    // Remover ou esconder controles de valor mínimo/máximo
+    const minValueControl = document.getElementById('minValue');
+    const maxValueControl = document.getElementById('maxValue');
+    const minValueLabel = document.querySelector('label[for="minValue"]');
+    const maxValueLabel = document.querySelector('label[for="maxValue"]');
+    
+    if (minValueControl) minValueControl.style.display = 'none';
+    if (maxValueControl) maxValueControl.style.display = 'none';
+    if (minValueLabel) minValueLabel.style.display = 'none';
+    if (maxValueLabel) maxValueLabel.style.display = 'none';
 }
 
 function updateSelect(selectId, options, defaultText) {
@@ -570,13 +616,17 @@ function updateSelect(selectId, options, defaultText) {
     if (!select) return;
     
     const currentValue = select.value;
+    
+    // Limpar opções
     select.innerHTML = '';
     
+    // Adicionar opção padrão
     const defaultOption = document.createElement('option');
     defaultOption.value = 'all';
     defaultOption.textContent = defaultText;
     select.appendChild(defaultOption);
     
+    // Adicionar opções
     options.forEach(option => {
         const opt = document.createElement('option');
         opt.value = option;
@@ -584,6 +634,7 @@ function updateSelect(selectId, options, defaultText) {
         select.appendChild(opt);
     });
     
+    // Restaurar valor selecionado se ainda existir
     if (currentValue && options.includes(currentValue)) {
         select.value = currentValue;
     }
@@ -591,11 +642,14 @@ function updateSelect(selectId, options, defaultText) {
 
 // ===== GRÁFICOS =====
 function createCharts() {
+    // Destruir gráficos existentes
     destroyCharts();
+    
+    // Criar novos gráficos
     createCategoryChart();
-    createStatusChart();
+    createStatusChart(); // ALTERADO para barras horizontais
     createDistrictChart();
-    createTimelineChart();
+    createTimelineChart(); // ALTERADO sem legenda
 }
 
 function destroyCharts() {
@@ -617,6 +671,8 @@ function createCategoryChart() {
     const labels = Object.keys(distribution);
     const data = labels.map(label => distribution[label].value);
     
+    const backgroundColors = generateColors(labels.length);
+    
     STATE.charts.category = new Chart(ctx, {
         type: STATE.chartTypes.category,
         data: {
@@ -624,42 +680,11 @@ function createCategoryChart() {
             datasets: [{
                 label: 'Valor (MZN)',
                 data: data,
-                backgroundColor: generateColors(labels.length),
+                backgroundColor: backgroundColors,
                 borderWidth: 1
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'right',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 20,
-                        font: { size: 11 }
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Valor por Categoria (MZN)',
-                    font: { size: 14, weight: '600' },
-                    padding: { top: 10, bottom: 20 }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed || 0;
-                            const itemCount = distribution[labels[context.dataIndex]]?.count || 0;
-                            return `${label}: ${formatCurrency(value)} (${itemCount} itens)`;
-                        }
-                    }
-                }
-            }
-        }
+        options: getCategoryChartOptions('Distribuição de Valor por Categoria', 'MZN')
     });
 }
 
@@ -675,74 +700,27 @@ function createStatusChart() {
     
     const backgroundColors = labels.map(label => {
         switch(label) {
-            case 'Bom': return 'rgba(46, 204, 113, 0.7)';
-            case 'Regular': return 'rgba(241, 196, 15, 0.7)';
-            case 'Ruim': return 'rgba(231, 76, 60, 0.7)';
-            default: return 'rgba(52, 152, 219, 0.7)';
+            case 'Bom': return '#10B981';
+            case 'Regular': return '#F97316';
+            case 'Ruim': return '#EF4444';
+            default: return '#6B7280';
         }
     });
-    
-    const borderColors = labels.map(label => {
-        switch(label) {
-            case 'Bom': return 'rgba(46, 204, 113, 1)';
-            case 'Regular': return 'rgba(241, 196, 15, 1)';
-            case 'Ruim': return 'rgba(231, 76, 60, 1)';
-            default: return 'rgba(52, 152, 219, 1)';
-        }
-    });
-    
-    if (STATE.charts.status) {
-        STATE.charts.status.destroy();
-    }
     
     STATE.charts.status = new Chart(ctx, {
-        type: 'bar',
+        type: 'bar', // Mantido como barra
         data: {
             labels: labels,
             datasets: [{
-                label: '',
+                label: '', // REMOVIDA LEGENDA
                 data: data,
                 backgroundColor: backgroundColors,
-                borderColor: borderColors,
                 borderWidth: 1,
-                borderRadius: {
-                    topLeft: 10,
-                    topRight: 10,
-                    bottomLeft: 10,
-                    bottomRight: 10
-                },
-                borderSkipped: false
+                // Adicionar bordas arredondadas
+                borderRadius: 5
             }]
         },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.parsed.x} itens`;
-                        }
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Estado de Conservação',
-                    font: { size: 14, weight: '600' },
-                    padding: { top: 10, bottom: 20 }
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Número de Itens' },
-                    grid: { display: true, color: 'rgba(0,0,0,0.05)' }
-                },
-                y: { grid: { display: false } }
-            }
-        }
+        options: getStatusChartOptions('Distribuição por Estado de Conservação', 'itens')
     });
 }
 
@@ -756,10 +734,6 @@ function createDistrictChart() {
     const labels = Object.keys(distribution);
     const data = labels.map(label => distribution[label]);
     
-    if (STATE.charts.district) {
-        STATE.charts.district.destroy();
-    }
-    
     STATE.charts.district = new Chart(ctx, {
         type: STATE.chartTypes.district,
         data: {
@@ -771,28 +745,7 @@ function createDistrictChart() {
                 borderWidth: 1
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'right',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 20,
-                        font: { size: 11 }
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Distribuição por Distrito',
-                    font: { size: 14, weight: '600' },
-                    padding: { top: 10, bottom: 20 }
-                }
-            }
-        }
+        options: getDistrictChartOptions('Distribuição por Distrito', 'itens')
     });
 }
 
@@ -806,67 +759,250 @@ function createTimelineChart() {
     const labels = Object.keys(timeline).sort();
     const data = labels.map(year => timeline[year].value);
     
-    if (STATE.charts.timeline) {
-        STATE.charts.timeline.destroy();
-    }
-    
     STATE.charts.timeline = new Chart(ctx, {
-        type: 'line',
+        type: STATE.chartTypes.timeline,
         data: {
             labels: labels,
             datasets: [{
-                label: '',
+                label: '', // REMOVIDA LEGENDA
                 data: data,
-                borderColor: 'rgba(155, 89, 182, 1)',
-                backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                borderWidth: 3,
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
                 fill: true,
-                tension: 0.3,
-                pointBackgroundColor: 'rgba(155, 89, 182, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7
+                tension: 0.4
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                title: {
-                    display: true,
-                    text: 'Aquisições ao Longo do Tempo',
-                    font: { size: 14, weight: '600' },
-                    padding: { top: 10, bottom: 20 }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return formatCurrency(context.parsed.y);
-                        }
-                    }
+        options: getTimelineChartOptions('Aquisições ao Longo do Tempo', 'MZN')
+    });
+}
+
+function getCategoryChartOptions(title, unit) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    padding: 20,
+                    font: {
+                        size: 11
+                    },
+                    usePointStyle: true, // PALETA CIRCULAR
+                    pointStyle: 'circle'
                 }
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Valor (MZN)' },
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    ticks: {
-                        callback: function(value) {
+            title: {
+                display: true,
+                text: title,
+                font: {
+                    size: 14,
+                    weight: '600'
+                },
+                padding: {
+                    top: 10,
+                    bottom: 30
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (unit === 'MZN') {
+                            label += formatCurrency(context.parsed.y || context.parsed);
+                        } else {
+                            label += context.parsed.y || context.parsed;
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        if (unit === 'MZN') {
                             return formatCurrency(value);
                         }
+                        return value;
                     }
-                },
-                x: {
-                    title: { display: true, text: 'Ano' },
-                    grid: { color: 'rgba(0,0,0,0.05)' }
                 }
             }
         }
-    });
+    };
 }
+
+function getStatusChartOptions(title, unit) {
+    return {
+        indexAxis: 'y', // BARRAS HORIZONTAIS
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false // SEM LEGENDA
+            },
+            title: {
+                display: true,
+                text: title,
+                font: {
+                    size: 14,
+                    weight: '600'
+                },
+                padding: {
+                    top: 10,
+                    bottom: 30
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.parsed.x} ${unit}`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Número de Itens'
+                }
+            }
+        }
+    };
+}
+
+function getDistrictChartOptions(title, unit) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    padding: 20,
+                    font: {
+                        size: 11
+                    },
+                    usePointStyle: true, // PALETA CIRCULAR
+                    pointStyle: 'circle'
+                }
+            },
+            title: {
+                display: true,
+                text: title,
+                font: {
+                    size: 14,
+                    weight: '600'
+                },
+                padding: {
+                    top: 10,
+                    bottom: 30
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        label += context.parsed || context.parsed;
+                        return label;
+                    }
+                }
+            }
+        }
+    };
+}
+
+function getTimelineChartOptions(title, unit) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false // SEM LEGENDA
+            },
+            title: {
+                display: true,
+                text: title,
+                font: {
+                    size: 14,
+                    weight: '600'
+                },
+                padding: {
+                    top: 10,
+                    bottom: 30
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = '';
+                        if (unit === 'MZN') {
+                            label += formatCurrency(context.parsed.y || context.parsed);
+                        } else {
+                            label += context.parsed.y || context.parsed;
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        if (unit === 'MZN') {
+                            return formatCurrency(value);
+                        }
+                        return value;
+                    }
+                }
+            }
+        }
+    };
+}
+
+function generateColors(count) {
+    const colors = [
+        '#3B82F6', '#10B981', '#F97316', '#8B5CF6', '#EF4444',
+        '#06B6D4', '#84CC16', '#F59E0B', '#EC4899', '#6366F1',
+        '#14B8A6', '#F43F5E', '#8B5CF6', '#EC4899', '#0EA5E9'
+    ];
+    
+    if (count <= colors.length) {
+        return colors.slice(0, count);
+    }
+    
+    // Gerar cores adicionais se necessário
+    const additionalColors = [];
+    for (let i = colors.length; i < count; i++) {
+        const hue = (i * 137.508) % 360; // Distribuição áurea
+        additionalColors.push(`hsl(${hue}, 70%, 65%)`);
+    }
+    
+    return [...colors, ...additionalColors].slice(0, count);
+}
+
+// Função para alternar tipo de gráfico
+window.toggleChartType = function(chartName) {
+    const types = ['pie', 'bar', 'line', 'doughnut'];
+    const currentIndex = types.indexOf(STATE.chartTypes[chartName]);
+    STATE.chartTypes[chartName] = types[(currentIndex + 1) % types.length];
+    
+    createCharts();
+    showNotification(`Gráfico alterado para: ${STATE.chartTypes[chartName]}`, 'info');
+};
 
 // ===== TABELAS =====
 function updateTables() {
@@ -881,6 +1017,7 @@ function updateCriticalTable() {
     
     tbody.innerHTML = '';
     
+    // Filtrar itens críticos
     const criticalItems = STATE.filteredData.filter(item => {
         const status = item['Estado_Conservação'];
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -902,6 +1039,7 @@ function updateCriticalTable() {
         return;
     }
     
+    // Adicionar itens à tabela
     criticalItems.slice(0, 20).forEach(item => {
         const row = document.createElement('tr');
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -933,6 +1071,7 @@ function updateAllItemsTable() {
     
     tbody.innerHTML = '';
     
+    // Calcular paginação
     const startIndex = (STATE.currentPage - 1) * STATE.itemsPerPage;
     const endIndex = startIndex + STATE.itemsPerPage;
     const paginatedItems = STATE.filteredData.slice(startIndex, endIndex);
@@ -952,6 +1091,7 @@ function updateAllItemsTable() {
         return;
     }
     
+    // Adicionar itens à tabela
     paginatedItems.forEach(item => {
         const row = document.createElement('tr');
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -983,6 +1123,7 @@ function updatePagination() {
     const totalItems = STATE.filteredData.length;
     const totalPages = Math.ceil(totalItems / STATE.itemsPerPage);
     
+    // Atualizar informações
     const paginationInfo = document.getElementById('paginationInfo');
     if (paginationInfo) {
         const start = ((STATE.currentPage - 1) * STATE.itemsPerPage) + 1;
@@ -990,11 +1131,13 @@ function updatePagination() {
         paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} itens`;
     }
     
+    // Atualizar controles
     const controls = document.getElementById('paginationControls');
     if (!controls) return;
     
     controls.innerHTML = '';
     
+    // Botão anterior
     const prevBtn = document.createElement('button');
     prevBtn.className = `btn-pagination ${STATE.currentPage === 1 ? 'disabled' : ''}`;
     prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -1002,6 +1145,7 @@ function updatePagination() {
     prevBtn.onclick = () => changePage(STATE.currentPage - 1);
     controls.appendChild(prevBtn);
     
+    // Números de página
     const maxVisiblePages = 5;
     let startPage = Math.max(1, STATE.currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
@@ -1018,6 +1162,7 @@ function updatePagination() {
         controls.appendChild(pageBtn);
     }
     
+    // Botão próximo
     const nextBtn = document.createElement('button');
     nextBtn.className = `btn-pagination ${STATE.currentPage === totalPages ? 'disabled' : ''}`;
     nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
@@ -1034,6 +1179,7 @@ function changePage(page) {
     STATE.currentPage = page;
     updateTables();
     
+    // Scroll suave para topo da tabela
     const tableSection = document.querySelector('.tables-section');
     if (tableSection) {
         tableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1076,6 +1222,7 @@ function updateSummaryContent() {
         </div>
     `;
     
+    // Adicionar distribuição por categoria
     const categories = Object.keys(indicators.categoryDistribution || {});
     if (categories.length > 0) {
         const topCategory = categories.reduce((a, b) => 
@@ -1095,6 +1242,7 @@ function updateSummaryContent() {
         `;
     }
     
+    // Adicionar distribuição geográfica
     const districts = Object.keys(indicators.districtDistribution || {});
     if (districts.length > 0) {
         const topDistrict = districts.reduce((a, b) => 
@@ -1124,6 +1272,7 @@ function updateRecommendations() {
     const indicators = STATE.indicators;
     const recommendations = [];
     
+    // Recomendações baseadas em indicadores
     if (indicators.criticalItems > 0) {
         recommendations.push({
             icon: 'exclamation-triangle',
@@ -1142,6 +1291,7 @@ function updateRecommendations() {
         });
     }
     
+    // Verificar idade dos itens
     const currentYear = new Date().getFullYear();
     const oldItems = STATE.filteredData.filter(item => {
         const date = item['Data_Aquisição'];
@@ -1159,6 +1309,7 @@ function updateRecommendations() {
         });
     }
     
+    // Verificar verificações pendentes
     const today = new Date();
     const pendingVerifications = STATE.filteredData.filter(item => {
         const lastVerification = item['Data_Ultima_Verificação'];
@@ -1168,7 +1319,7 @@ function updateRecommendations() {
         const diffTime = Math.abs(today - lastDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        return diffDays > 365;
+        return diffDays > 365; // Mais de 1 ano
     }).length;
     
     if (pendingVerifications > 0) {
@@ -1180,6 +1331,7 @@ function updateRecommendations() {
         });
     }
     
+    // Se não houver recomendações específicas
     if (recommendations.length === 0) {
         recommendations.push({
             icon: 'check-circle',
@@ -1189,6 +1341,7 @@ function updateRecommendations() {
         });
     }
     
+    // Gerar HTML
     let recommendationsHTML = '';
     recommendations.forEach(rec => {
         recommendationsHTML += `
@@ -1214,14 +1367,21 @@ function applyFilters() {
         return;
     }
     
+    // Coletar valores dos filtros - SEM minValue e maxValue
     collectFilterValues();
     
+    // Aplicar filtros
     STATE.filteredData = STATE.processedData.filter(item => {
         return applyAllFilters(item);
     });
     
+    // Recalcular indicadores
     calculateIndicators();
+    
+    // Resetar paginação
     STATE.currentPage = 1;
+    
+    // Atualizar UI
     updateDashboard();
     
     showNotification(`Filtros aplicados: ${STATE.filteredData.length} itens encontrados`, 'success');
@@ -1233,6 +1393,12 @@ function collectFilterValues() {
     STATE.filters.status = getSelectValue('statusFilter');
     STATE.filters.responsible = getSelectValue('responsibleFilter');
     STATE.filters.use = getSelectValue('useFilter');
+    
+    // REMOVIDOS: minValue e maxValue
+    // const minValue = document.getElementById('minValue')?.value;
+    // const maxValue = document.getElementById('maxValue')?.value;
+    // STATE.filters.minValue = minValue ? parseFloat(minValue) : null;
+    // STATE.filters.maxValue = maxValue ? parseFloat(maxValue) : null;
 }
 
 function getSelectValue(selectId) {
@@ -1243,26 +1409,41 @@ function getSelectValue(selectId) {
 function applyAllFilters(item) {
     const filters = STATE.filters;
     
+    // Filtro de categoria
     if (filters.category !== 'all' && filters.category !== item['Categoria']) {
         return false;
     }
     
+    // Filtro de distrito
     if (filters.district !== 'all' && filters.district !== item['Distrito_Localização']) {
         return false;
     }
     
+    // Filtro de estado
     if (filters.status !== 'all' && filters.status !== item['Estado_Conservação']) {
         return false;
     }
     
+    // Filtro de responsável
     if (filters.responsible !== 'all' && filters.responsible !== item['Responsável_Item']) {
         return false;
     }
     
+    // Filtro de uso
     if (filters.use !== 'all' && filters.use !== item['Uso_Actual']) {
         return false;
     }
     
+    // REMOVIDOS: Filtros de valor
+    // const value = parseFloat(item['Valor_Aquisição']) || 0;
+    // if (filters.minValue !== null && value < filters.minValue) {
+    //     return false;
+    // }
+    // if (filters.maxValue !== null && value > filters.maxValue) {
+    //     return false;
+    // }
+    
+    // Filtro de busca
     if (STATE.searchTerm && STATE.searchTerm.trim() !== '') {
         const searchLower = STATE.searchTerm.toLowerCase();
         const searchFields = [
@@ -1285,6 +1466,7 @@ function applyAllFilters(item) {
 }
 
 function resetFilters() {
+    // Resetar estado - SEM minValue e maxValue
     STATE.filters = {
         category: 'all',
         district: 'all',
@@ -1296,6 +1478,7 @@ function resetFilters() {
     STATE.searchTerm = '';
     STATE.currentPage = 1;
     
+    // Resetar controles - SEM controles de valor
     const controls = [
         'categoryFilter', 'districtFilter', 'statusFilter',
         'responsibleFilter', 'useFilter', 'searchInput'
@@ -1312,9 +1495,14 @@ function resetFilters() {
         }
     });
     
+    // REMOVIDOS: document.getElementById('minValue').value = '';
+    // REMOVIDOS: document.getElementById('maxValue').value = '';
     document.getElementById('tableSearch').value = '';
     
+    // Resetar dados filtrados
     STATE.filteredData = [...STATE.processedData];
+    
+    // Recalcular
     calculateIndicators();
     updateDashboard();
     
@@ -1340,10 +1528,14 @@ function handleTableSearch(e) {
 function exportToPDF() {
     showLoading('Gerando relatório PDF...');
     
+    // Simular geração de PDF (em produção usar jsPDF)
     setTimeout(() => {
         hideLoading();
         
+        // Criar conteúdo do relatório
         const reportContent = generateReportContent();
+        
+        // Criar blob e download
         const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         const fileName = `relatorio_aprodet_${new Date().getTime()}.txt`;
@@ -1372,17 +1564,21 @@ function exportToCSV() {
         const headers = CONFIG.REQUIRED_COLUMNS;
         const csvRows = [];
         
+        // Cabeçalhos
         csvRows.push(headers.join(';'));
         
+        // Dados
         STATE.filteredData.forEach(item => {
             const row = headers.map(header => {
                 const value = item[header] || '';
+                // Escapar ponto e vírgula e aspas
                 const escaped = String(value).replace(/"/g, '""');
                 return `"${escaped}"`;
             });
             csvRows.push(row.join(';'));
         });
         
+        // Criar e baixar
         const csvString = csvRows.join('\n');
         const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -1419,6 +1615,7 @@ function exportReport() {
     
     const reportContent = generateReportContent();
     
+    // Criar e baixar
     const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
     const link = document.createElement('a');
     const fileName = `relatorio_detalhado_aprodet_${new Date().getTime()}.txt`;
@@ -1508,13 +1705,16 @@ function showDashboard() {
     document.getElementById('uploadPage').style.display = 'none';
     document.getElementById('dashboardPage').style.display = 'block';
     
+    // Atualizar data e hora
     updateCurrentDate();
     document.getElementById('lastUpdate').textContent = 
         new Date().toLocaleTimeString('pt-PT');
     
+    // Atualizar contador
     document.getElementById('processedItems').textContent = 
         STATE.processedData.length;
     
+    // Scroll para topo
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1523,6 +1723,7 @@ function goBackToHome() {
     document.getElementById('uploadPage').style.display = 'block';
     clearSelectedFile();
     
+    // Resetar estado
     STATE.filteredData = [...STATE.processedData];
     STATE.currentPage = 1;
     
@@ -1601,6 +1802,7 @@ function updateCurrentDate() {
 }
 
 function updateUIState() {
+    // Atualizar estado dos botões baseado nos dados
     const hasData = STATE.filteredData && STATE.filteredData.length > 0;
     
     const exportButtons = ['exportPdfBtn', 'exportCsvBtn', 'exportReportBtn'];
@@ -1674,6 +1876,7 @@ window.showItemDetails = function(itemId) {
             </div>
     `;
     
+    // Adicionar campos opcionais se existirem
     if (item['Descrição']) {
         modalHTML += `
             <div class="detail-row">
@@ -1757,6 +1960,7 @@ window.showNotification = function(message, type = 'info') {
     
     if (!notification || !notificationText || !notificationIcon) return;
     
+    // Configurar ícone
     let iconClass = 'fa-info-circle';
     if (type === 'success') iconClass = 'fa-check-circle';
     else if (type === 'error') iconClass = 'fa-exclamation-circle';
@@ -1767,6 +1971,7 @@ window.showNotification = function(message, type = 'info') {
     notification.className = `notification ${type}`;
     notification.style.display = 'block';
     
+    // Esconder automaticamente
     setTimeout(() => {
         notification.style.display = 'none';
     }, 5000);
@@ -1779,103 +1984,6 @@ window.hideNotification = function() {
     }
 };
 
-// ===== GERADOR DE CORES =====
-function generateColors(count) {
-    const colors = [
-        'rgba(52, 152, 219, 0.8)',
-        'rgba(46, 204, 113, 0.8)',
-        'rgba(155, 89, 182, 0.8)',
-        'rgba(241, 196, 15, 0.8)',
-        'rgba(230, 126, 34, 0.8)',
-        'rgba(231, 76, 60, 0.8)',
-        'rgba(149, 165, 166, 0.8)',
-        'rgba(26, 188, 156, 0.8)',
-        'rgba(155, 89, 182, 0.8)',
-        'rgba(22, 160, 133, 0.8)'
-    ];
-    
-    if (count <= colors.length) {
-        return colors.slice(0, count);
-    }
-    
-    const additionalColors = [];
-    for (let i = colors.length; i < count; i++) {
-        const hue = (i * 137.508) % 360;
-        additionalColors.push(`hsl(${hue}, 70%, 65%)`);
-    }
-    
-    return [...colors, ...additionalColors].slice(0, count);
-}
-
-// ===== ESTILOS DINÂMICOS =====
-function addDynamicStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Ajuste para valor total do patrimônio */
-        .patrimony-value {
-            font-size: 19px !important;
-            line-height: 1.2;
-            word-break: break-word;
-        }
-        
-        .patrimony-value.font-small {
-            font-size: 17px !important;
-        }
-        
-        .patrimony-value.font-very-small {
-            font-size: 15px !important;
-        }
-        
-        /* Logotipo APD */
-        .apd-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-right: 20px;
-        }
-        
-        .apd-text {
-            font-size: 24px;
-            font-weight: 800;
-            color: #3498db;
-            letter-spacing: 1px;
-        }
-        
-        .apd-label {
-            font-size: 10px;
-            color: #ecf0f1;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-        
-        /* @Falcandra Data Consulting */
-        .consulting-text {
-            font-size: 14px;
-            color: #3498db;
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-        
-        /* Remoção de filtros de valor */
-        .value-filter-controls {
-            display: none !important;
-        }
-        
-        /* Ajustes para gráficos */
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-    `;
-    
-    document.head.appendChild(style);
-}
-
 // ===== PREVENIR SAÍDA =====
 window.addEventListener('beforeunload', function(e) {
     if (STATE.isLoading) {
@@ -1885,15 +1993,21 @@ window.addEventListener('beforeunload', function(e) {
     }
 });
 
-// ===== FUNÇÕES GLOBAIS =====
-window.toggleChartType = function(chartName) {
-    const types = ['pie', 'bar', 'line', 'doughnut'];
-    const currentIndex = types.indexOf(STATE.chartTypes[chartName]);
-    STATE.chartTypes[chartName] = types[(currentIndex + 1) % types.length];
-    
-    createCharts();
-    showNotification(`Gráfico alterado para: ${STATE.chartTypes[chartName]}`, 'info');
-};
-
 // ===== INICIALIZAÇÃO FINAL =====
-console.log('APRODET Dashboard carregado com sucesso!');
+// Garantir que tudo está configurado
+setTimeout(() => {
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+        Chart.defaults.color = '#6B7280';
+    }
+    
+    // Adicionar estilo CSS para fonte menor no card de valor total
+    const style = document.createElement('style');
+    style.textContent = `
+        .smaller-font {
+            font-size: 19px !important;
+            line-height: 1.2;
+        }
+    `;
+    document.head.appendChild(style);
+}, 100);
