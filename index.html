@@ -36,7 +36,7 @@
             padding: 0 20px;
         }
         
-        /* ===== NOVA BARRA SUPERIOR AZUL ===== */
+        /* ===== NOVA BARRA SUPERIOR AZUL COM 4 CÍRCULOS ===== */
         .header-container {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             padding: 20px 30px;
@@ -47,45 +47,64 @@
             overflow: hidden;
         }
         
-        .header-container::before {
-            content: "⋯";
-            position: absolute;
-            top: 15px;
-            left: 25px;
-            font-size: 32px;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: bold;
-            line-height: 1;
-        }
-        
         .header-content {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 20px;
             color: white;
+        }
+        
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .logo-circles {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3B82F6;
         }
         
         .aprodet-logo {
             font-size: 32px;
             font-weight: 800;
-            color: #f97316 !important;
+            color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             letter-spacing: 1px;
-            margin-left: 50px;
         }
         
-        .dashboard-title {
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+        
+        .dashboard-title-header {
             font-size: 24px;
             font-weight: 600;
             color: white;
-            flex-grow: 1;
-            text-align: center;
+            margin-bottom: 5px;
         }
         
         .header-info {
             font-size: 14px;
             opacity: 0.9;
-            text-align: right;
+            margin-top: 5px;
+        }
+        
+        /* Data/hora com fonte menor */
+        .date-time {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
             margin-top: 5px;
         }
         
@@ -390,7 +409,7 @@
             background-color: #c0392b;
         }
         
-        /* ===== KPI CARDS (SEM ÍCONES) ===== */
+        /* ===== KPI CARDS COM FUNDO TRANSPARENTE AZUL (SEM ÍCONES) ===== */
         .kpi-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -399,12 +418,14 @@
         }
         
         .kpi-card {
-            background: white;
+            background: rgba(147, 197, 253, 0.15); /* Azul transparente combinando com logo */
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s, box-shadow 0.3s;
             text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(8px);
         }
         
         .kpi-card:hover {
@@ -440,7 +461,7 @@
         .kpi-details {
             font-size: 14px;
             color: #34495e;
-            background-color: #f8f9fa;
+            background-color: rgba(248, 249, 250, 0.7);
             padding: 8px 12px;
             border-radius: 6px;
             margin-top: 10px;
@@ -1041,17 +1062,16 @@
                 gap: 15px;
             }
             
-            .header-container::before {
-                position: static;
-                margin-bottom: 10px;
-                display: block;
+            .header-left, .header-right {
+                align-items: center;
+                text-align: center;
             }
             
             .aprodet-logo {
                 margin-left: 0;
             }
             
-            .dashboard-title {
+            .dashboard-title-header {
                 font-size: 20px;
             }
             
@@ -1119,13 +1139,25 @@
     </style>
 </head>
 <body>
-    <!-- Nova Barra Superior Azul -->
+    <!-- Nova Barra Superior Azul COM 4 CÍRCULOS -->
     <div class="header-container">
         <div class="header-content">
-            <div class="aprodet-logo">APRODET</div>
-            <div class="dashboard-title">
-                APRODET Dashboard
+            <div class="header-left">
+                <!-- 4 círculos acima de APRODET -->
+                <div class="logo-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+                <div class="aprodet-logo">APRODET</div>
+            </div>
+            <div class="header-right">
+                <!-- APRODET Dashboard acima do subtítulo -->
+                <div class="dashboard-title-header">APRODET Dashboard</div>
                 <div class="header-info" id="currentFileInfo">Analisando: Aprodet_Filled_Data.xlsx</div>
+                <!-- Data/hora com fonte menor -->
+                <div class="date-time" id="currentDate">domingo, 8 de fevereiro de 2026 às 22:14</div>
             </div>
         </div>
     </div>
@@ -1187,7 +1219,7 @@
             <div class="dashboard-header">
                 <div class="dashboard-title">
                     <h1>Dashboard de Análise Patrimonial</h1>
-                    <p id="currentDate">Carregando data...</p>
+                    <p id="dashboardDate">Carregando data...</p>
                 </div>
                 <div class="dashboard-actions">
                     <button id="backToHomeBtn" class="btn-outline">
@@ -1270,7 +1302,7 @@
                 </div>
             </div>
 
-            <!-- KPI Cards (SEM ÍCONES) -->
+            <!-- KPI Cards COM FUNDO TRANSPARENTE AZUL (SEM ÍCONES) -->
             <div class="kpi-cards">
                 <div class="kpi-card">
                     <div id="totalValue" class="kpi-value">
