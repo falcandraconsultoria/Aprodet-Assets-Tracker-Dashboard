@@ -1,4 +1,4 @@
-// main.js - versão simplificada
+// main.js - versão finalizada
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos
@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     fileInput.addEventListener('change', function() {
         if (this.files.length > 0) {
+            // Exibir as informações do arquivo selecionado
+            const file = this.files[0];
+            document.getElementById('fileNameDisplay').textContent = file.name;
+            document.getElementById('fileSizeDisplay').textContent = `${(file.size / 1024).toFixed(2)} KB`;
+            
+            // Exibir informações do arquivo e esconder área de upload
             document.getElementById('fileInfo').style.display = 'block';
             document.getElementById('uploadArea').style.display = 'none';
         }
@@ -21,14 +27,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Iniciar análise
     startAnalysisBtn.addEventListener('click', function() {
-        // Gerar dados de demonstração
-        generateDemoData();
+        // Selecione um arquivo para processamento ou gere dados de demonstração
+        const file = fileInput.files[0];
+        if (file) {
+            processFile(file);
+        } else {
+            generateDemoData(); // Se nenhum arquivo for selecionado, gerar dados de demonstração
+        }
         
         // Mostrar dashboard
         uploadPage.style.display = 'none';
         dashboardPage.style.display = 'block';
         
-        // Atualizar dashboard
+        // Atualizar o dashboard
         updateDashboard();
     });
     
@@ -39,16 +50,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Função para processar o arquivo carregado
+function processFile(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        const data = event.target.result;
+        
+        // Processar os dados do arquivo Excel/CSV
+        const workbook = XLSX.read(data, {type: 'binary'});
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        window.demoData = XLSX.utils.sheet_to_json(sheet);
+        
+        // Atualizar dashboard
+        updateDashboard();
+    };
+    
+    reader.readAsBinaryString(file);
+}
+
+// Função para gerar dados de demonstração
 function generateDemoData() {
     // Gerar dados de demonstração
     window.demoData = [
         { id: 'ITEM-001', nome: 'Computador', categoria: 'Equipamento', estado: 'Bom', valor: 2500 },
         { id: 'ITEM-002', nome: 'Mesa', categoria: 'Mobiliário', estado: 'Regular', valor: 800 },
         { id: 'ITEM-003', nome: 'Carro', categoria: 'Veículo', estado: 'Bom', valor: 150000 },
-        // ... mais dados
+        { id: 'ITEM-004', nome: 'Cadeira', categoria: 'Mobiliário', estado: 'Bom', valor: 300 },
+        { id: 'ITEM-005', nome: 'Projetor', categoria: 'Equipamento', estado: 'Ruim', valor: 5000 },
     ];
 }
 
+// Função para atualizar o dashboard com os dados
 function updateDashboard() {
     const data = window.demoData || [];
     
@@ -64,19 +97,52 @@ function updateDashboard() {
     populateTable(data);
 }
 
+// Função para criar gráficos (exemplo com Chart.js)
 function createCharts(data) {
-    // Gráfico de categorias
+    // Gráfico de categorias (Pizza)
     const ctx1 = document.getElementById('categoryChart').getContext('2d');
-    // ... código do gráfico
     
-    // Gráfico de estados
+    const categories = data.reduce((acc, item) => {
+        const category = item.categoria;
+        acc[category] = (acc[category] || 0) + item.valor;
+        return acc;
+    }, {});
+    
+    new Chart(ctx1, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(categories),
+            datasets: [{
+                data: Object.values(categories),
+                backgroundColor: ['#3B82F6', '#10B981', '#F97316', '#EF4444'],
+            }],
+        },
+    });
+
+    // Gráfico de estados (Barra)
     const ctx2 = document.getElementById('statusChart').getContext('2d');
-    // ... código do gráfico
+    const statusData = data.reduce((acc, item) => {
+        const state = item.estado;
+        acc[state] = (acc[state] || 0) + 1;
+        return acc;
+    }, {});
+
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(statusData),
+            datasets: [{
+                data: Object.values(statusData),
+                backgroundColor: ['#10B981', '#F97316', '#EF4444'],
+            }],
+        },
+    });
 }
 
+// Função para popular a tabela com dados
 function populateTable(data) {
     const tbody = document.getElementById('itemsTableBody');
-    tbody.innerHTML = '';
+    tbody.innerHTML = ''; // Limpa a tabela antes de popular
     
     data.forEach(item => {
         const row = `<tr>
