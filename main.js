@@ -1,5 +1,5 @@
-// main.js - APRODET Dashboard
-// Código JavaScript completo para funcionamento do dashboard
+// main.js - APRODET Dashboard Completo
+// Sistema de análise patrimonial com upload de Excel/CSV
 
 // ===== CONFIGURAÇÕES =====
 const REQUIRED_COLUMNS = [
@@ -11,7 +11,7 @@ const REQUIRED_COLUMNS = [
     'Data_Ultima_Verificação', 'Observações'
 ];
 
-// ===== ESTADO DA APLICAÇÃO =====
+// ===== ESTADO GLOBAL =====
 const state = {
     currentFile: null,
     processedData: null,
@@ -29,23 +29,28 @@ const state = {
     },
     currentPage: 1,
     itemsPerPage: 10,
-    searchTerm: ''
+    searchTerm: '',
+    isLoading: false
 };
 
-// ===== ELEMENTOS DOM (serão inicializados) =====
+// ===== ELEMENTOS DOM =====
 let elements = {};
 
-// ===== INICIALIZAÇÃO =====
+// ===== INICIALIZAÇÃO PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', function() {
-    initElements();
-    initUploadPage();
-    initDashboard();
-    updateCurrentDate();
+    initializeElements();
     setupEventListeners();
+    updateCurrentDate();
+    
+    // Configurar drag and drop
+    setupDragAndDrop();
+    
+    // Verificar se há dados salvos
+    checkForSavedData();
 });
 
 // ===== INICIALIZAÇÃO DE ELEMENTOS =====
-function initElements() {
+function initializeElements() {
     // Páginas
     elements.uploadPage = document.getElementById('uploadPage');
     elements.dashboardPage = document.getElementById('dashboardPage');
@@ -93,90 +98,64 @@ function initElements() {
     // Exportação
     elements.exportPdfBtn = document.getElementById('exportPdfBtn');
     elements.exportCsvBtn = document.getElementById('exportCsvBtn');
+    elements.exportReportBtn = document.getElementById('exportReportBtn');
 }
 
 // ===== CONFIGURAÇÃO DE EVENT LISTENERS =====
 function setupEventListeners() {
+    // Upload
+    if (elements.selectFileBtn) {
+        elements.selectFileBtn.addEventListener('click', () => elements.fileInput.click());
+    }
+    
+    if (elements.fileInput) {
+        elements.fileInput.addEventListener('change', handleFileSelect);
+    }
+    
+    if (elements.clearFileBtn) {
+        elements.clearFileBtn.addEventListener('click', clearSelectedFile);
+    }
+    
+    if (elements.startAnalysisBtn) {
+        elements.startAnalysisBtn.addEventListener('click', startAnalysis);
+    }
+    
+    // Dashboard
+    if (elements.backToHomeBtn) {
+        elements.backToHomeBtn.addEventListener('click', goBackToHome);
+    }
+    
     // Filtros
     if (elements.applyFiltersBtn) {
         elements.applyFiltersBtn.addEventListener('click', applyFilters);
     }
+    
     if (elements.resetFiltersBtn) {
         elements.resetFiltersBtn.addEventListener('click', resetFilters);
     }
+    
     if (elements.searchInput) {
-        elements.searchInput.addEventListener('input', debounce(applySearch, 300));
+        elements.searchInput.addEventListener('input', function(e) {
+            state.searchTerm = e.target.value;
+            applyFilters();
+        });
     }
     
     // Exportação
     if (elements.exportPdfBtn) {
         elements.exportPdfBtn.addEventListener('click', exportToPDF);
     }
+    
     if (elements.exportCsvBtn) {
         elements.exportCsvBtn.addEventListener('click', exportToCSV);
     }
-}
-
-// ===== FUNÇÕES DA PÁGINA DE UPLOAD =====
-function initUploadPage() {
-    // Botão selecionar arquivo
-    if (elements.selectFileBtn) {
-        elements.selectFileBtn.addEventListener('click', () => {
-            elements.fileInput.click();
-        });
-    }
     
-    // Quando arquivo é selecionado
-    if (elements.fileInput) {
-        elements.fileInput.addEventListener('change', handleFileSelect);
-    }
-    
-    // Drag and drop
-    setupDragAndDrop();
-    
-    // Limpar arquivo
-    if (elements.clearFileBtn) {
-        elements.clearFileBtn.addEventListener('click', clearSelectedFile);
-    }
-    
-    // Iniciar análise
-    if (elements.startAnalysisBtn) {
-        elements.startAnalysisBtn.addEventListener('click', startAnalysis);
+    if (elements.exportReportBtn) {
+        elements.exportReportBtn.addEventListener('click', exportReport);
     }
 }
 
-function handleFileSelect() {
-    const file = elements.fileInput.files[0];
-    if (!file) return;
-    
-    // Validar tipo
-    const validExtensions = ['.xlsx', '.xls', '.csv'];
-    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-    
-    if (!validExtensions.includes(fileExtension)) {
-        alert('Formato de arquivo inválido. Use .xlsx, .xls ou .csv');
-        clearSelectedFile();
-        return;
-    }
-    
-    // Atualizar estado
-    state.currentFile = file;
-    
-    // Atualizar interface
-    if (elements.fileNameDisplay) {
-        elements.fileNameDisplay.textContent = file.name;
-    }
-    if (elements.fileSizeDisplay) {
-        elements.fileSizeDisplay.textContent = formatFileSize(file.size);
-    }
-    if (elements.fileInfo) {
-        elements.fileInfo.style.display = 'block';
-    }
-    if (elements.uploadArea) {
-        elements.uploadArea.style.display = 'none';
-    }
-}
-
+// ===== DRAG AND DROP =====
 function setupDragAndDrop() {
     if (!elements.uploadArea) return;
     
@@ -200,6 +179,31 @@ function setupDragAndDrop() {
     });
 }
 
+// ===== MANIPULAÇÃO DE ARQUIVOS =====
+function handleFileSelect() {
+    const file = elements.fileInput.files[0];
+    if (!file) return;
+    
+    // Validar tipo
+    const validExtensions = ['.xlsx', '.xls', '.csv'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (!validExtensions.includes(fileExtension)) {
+        showNotification('Formato de arquivo inválido. Use .xlsx, .xls ou .csv', 'error');
+        clearSelectedFile();
+        return;
+    }
+    
+    // Atualizar estado
+    state.currentFile = file;
+    
+    // Atualizar interface
+    elements.fileNameDisplay.textContent = file.name;
+    elements.fileSizeDisplay.textContent = formatFileSize(file.size);
+    elements.fileInfo.style.display = 'block';
+    elements.uploadArea.style.display = 'none';
+}
+
 function clearSelectedFile() {
     elements.fileInput.value = '';
     state.currentFile = null;
@@ -215,42 +219,42 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// ===== ANÁLISE DE DADOS =====
 async function startAnalysis() {
     showLoading('Processando dados...');
+    state.isLoading = true;
     
     try {
         if (state.currentFile) {
-            // Tentar processar arquivo real
             await processRealFile(state.currentFile);
         } else {
-            // Usar dados de demonstração
             generateDemoData();
+        }
+        
+        // Validar dados
+        const validation = validateData(state.processedData);
+        if (!validation.valid) {
+            throw new Error(validation.message);
         }
         
         // Atualizar dashboard
         updateDashboard();
         
         // Mostrar dashboard
-        elements.uploadPage.style.display = 'none';
-        elements.dashboardPage.style.display = 'block';
+        switchToDashboard();
         
-        // Atualizar subtítulo
-        if (state.currentFile) {
-            elements.dashboardSubtitle.textContent = `Analisando: ${state.currentFile.name}`;
-        } else {
-            elements.dashboardSubtitle.textContent = 'Modo de demonstração';
-        }
+        // Salvar dados para recarregamento
+        saveDataToStorage();
         
     } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao processar arquivo. Usando dados de demonstração.');
+        console.error('Erro na análise:', error);
+        showNotification(`Erro: ${error.message}. Usando dados de demonstração.`, 'warning');
         generateDemoData();
         updateDashboard();
-        elements.uploadPage.style.display = 'none';
-        elements.dashboardPage.style.display = 'block';
-        elements.dashboardSubtitle.textContent = 'Modo de demonstração';
+        switchToDashboard();
     } finally {
         hideLoading();
+        state.isLoading = false;
     }
 }
 
@@ -263,7 +267,8 @@ async function processRealFile(file) {
                 if (file.name.endsWith('.csv')) {
                     state.processedData = parseCSV(e.target.result);
                 } else {
-                    // Para Excel, usamos dados demo (em produção usar SheetJS)
+                    // Para Excel, usamos dados demo
+                    showNotification('Arquivo Excel detectado. Usando dados de demonstração.', 'info');
                     state.processedData = generateDemoData();
                 }
                 state.filteredData = [...state.processedData];
@@ -277,7 +282,7 @@ async function processRealFile(file) {
         reader.onerror = reject;
         
         if (file.name.endsWith('.csv')) {
-            reader.readAsText(file);
+            reader.readAsText(file, 'UTF-8');
         } else {
             reader.readAsArrayBuffer(file);
         }
@@ -285,27 +290,26 @@ async function processRealFile(file) {
 }
 
 function parseCSV(csvText) {
-    const lines = csvText.split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
+    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line);
+    if (lines.length < 2) return [];
     
+    const headers = lines[0].split(',').map(h => h.trim());
     const data = [];
+    
     for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim() === '') continue;
-        
-        const values = lines[i].split(',');
+        const values = lines[i].split(',').map(v => v.trim());
         const item = {};
         
         headers.forEach((header, index) => {
-            item[header] = values[index] ? values[index].trim() : '';
+            let value = values[index] || '';
+            
+            // Converter tipos de dados
+            if (header === 'Valor_Aquisição' || header === 'Quantidade') {
+                value = parseFloat(value) || (header === 'Quantidade' ? 1 : 0);
+            }
+            
+            item[header] = value;
         });
-        
-        // Converter valores numéricos
-        if (item['Valor_Aquisição']) {
-            item['Valor_Aquisição'] = parseFloat(item['Valor_Aquisição']) || 0;
-        }
-        if (item['Quantidade']) {
-            item['Quantidade'] = parseInt(item['Quantidade']) || 1;
-        }
         
         data.push(item);
     }
@@ -329,27 +333,30 @@ function generateDemoData() {
         const district = districts[i % districts.length];
         const value = Math.round((Math.random() * 100000 + 1000) * 100) / 100;
         const quantity = Math.floor(Math.random() * 5) + 1;
+        const year = 2018 + (i % 6);
+        const month = (i % 12) + 1;
+        const day = (i % 28) + 1;
         
         demoData.push({
             'ID_Item': `ITEM-${i.toString().padStart(3, '0')}`,
-            'Codigo_Patrimonial': `CP-${2020 + (i % 5)}-${i}`,
+            'Codigo_Patrimonial': `CP-${year}-${i}`,
             'Nome_Item': `${category} ${i}`,
             'Número de serie': `SN-${10000 + i}`,
             'Categoria': category,
-            'Descrição': `Descrição do ${category.toLowerCase()} ${i}`,
+            'Descrição': `Descrição do ${category.toLowerCase()} modelo ${i}`,
             'Quantidade': quantity,
             'Estado_Conservação': status,
-            'Data_Aquisição': `202${Math.floor(Math.random() * 5)}-${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0')}-${(Math.floor(Math.random() * 28) + 1).toString().padStart(2, '0')}`,
+            'Data_Aquisição': `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
             'Valor_Aquisição': value,
             'Fonte_Aquisição': ['Compra', 'Doação', 'Transferência'][i % 3],
             'Fornecedor': `Fornecedor ${(i % 10) + 1}`,
-            'Localização_Item': `Sala ${(i % 20) + 1}`,
+            'Localização_Item': `Sala ${(i % 20) + 1}, Piso ${(i % 3) + 1}`,
             'Distrito_Localização': district,
             'Uso_Actual': uses[i % uses.length],
             'Responsável_Item': responsibles[i % responsibles.length],
             'Contacto_Responsável_Item': `+258 8${i % 10}${i % 10} ${i % 10}${i % 10}${i % 10} ${i % 10}${i % 10}${i % 10}`,
             'Vida_Util_Estimada': (5 + (i % 15)).toString(),
-            'Data_Ultima_Verificação': `2023-${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0')}-${(Math.floor(Math.random() * 28) + 1).toString().padStart(2, '0')}`,
+            'Data_Ultima_Verificação': `2023-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
             'Observações': i % 7 === 0 ? 'Necessita manutenção urgente' : (i % 5 === 0 ? 'Verificar estado' : '')
         });
     }
@@ -370,30 +377,46 @@ function calculateIndicators() {
     
     const data = state.processedData;
     
-    // Valor total
-    const totalValue = data.reduce((sum, item) => {
+    // Valor total e contagem
+    let totalValue = 0;
+    let totalItems = 0;
+    const statusDistribution = {};
+    const categoryDistribution = {};
+    const districtDistribution = {};
+    const criticalItems = [];
+    
+    data.forEach(item => {
         const value = parseFloat(item['Valor_Aquisição']) || 0;
         const quantity = parseInt(item['Quantidade']) || 1;
-        return sum + (value * quantity);
-    }, 0);
-    
-    // Total de itens (considerando quantidade)
-    const totalItems = data.reduce((sum, item) => {
-        return sum + (parseInt(item['Quantidade']) || 1);
-    }, 0);
-    
-    // Distribuição por estado
-    const statusDistribution = {};
-    data.forEach(item => {
         const status = item['Estado_Conservação'] || 'Não Informado';
-        const quantity = parseInt(item['Quantidade']) || 1;
+        const category = item['Categoria'] || 'Não Categorizado';
+        const district = item['Distrito_Localização'] || 'Não Especificado';
+        
+        // Valor total
+        totalValue += value * quantity;
+        totalItems += quantity;
+        
+        // Distribuição por estado
         statusDistribution[status] = (statusDistribution[status] || 0) + quantity;
+        
+        // Distribuição por categoria
+        if (!categoryDistribution[category]) {
+            categoryDistribution[category] = { value: 0, count: 0 };
+        }
+        categoryDistribution[category].value += value * quantity;
+        categoryDistribution[category].count += quantity;
+        
+        // Distribuição por distrito
+        districtDistribution[district] = (districtDistribution[district] || 0) + 1;
+        
+        // Itens críticos
+        if (status === 'Ruim' && value > 5000) {
+            criticalItems.push(item);
+        }
     });
     
     // Calcular estado médio (0-100%)
     let statusScore = 0;
-    let totalItemsForScore = 0;
-    
     data.forEach(item => {
         const status = item['Estado_Conservação'];
         const quantity = parseInt(item['Quantidade']) || 1;
@@ -401,43 +424,26 @@ function calculateIndicators() {
         if (status === 'Bom') statusScore += quantity * 100;
         else if (status === 'Regular') statusScore += quantity * 60;
         else if (status === 'Ruim') statusScore += quantity * 20;
-        else statusScore += quantity * 50; // Não informado
-        
-        totalItemsForScore += quantity;
+        else statusScore += quantity * 50;
     });
     
-    const avgStatus = totalItemsForScore > 0 ? Math.round(statusScore / totalItemsForScore) : 0;
+    const avgStatus = totalItems > 0 ? Math.round(statusScore / totalItems) : 0;
     
-    // Itens críticos (valor alto + estado ruim)
-    const criticalItems = data.filter(item => {
-        const value = parseFloat(item['Valor_Aquisição']) || 0;
-        const status = item['Estado_Conservação'];
-        return status === 'Ruim' && value > 5000;
-    }).length;
-    
-    // Distribuição por categoria
-    const categoryDistribution = {};
+    // Timeline (aquisições por ano)
+    const timelineData = {};
     data.forEach(item => {
-        const category = item['Categoria'] || 'Não Categorizado';
+        const date = item['Data_Aquisição'];
+        if (!date) return;
+        
+        const year = date.substring(0, 4);
         const value = parseFloat(item['Valor_Aquisição']) || 0;
         const quantity = parseInt(item['Quantidade']) || 1;
         
-        if (!categoryDistribution[category]) {
-            categoryDistribution[category] = { value: 0, count: 0 };
+        if (!timelineData[year]) {
+            timelineData[year] = { value: 0, count: 0 };
         }
-        
-        categoryDistribution[category].value += value * quantity;
-        categoryDistribution[category].count += quantity;
-    });
-    
-    // Distribuição por distrito
-    const districtDistribution = {};
-    data.forEach(item => {
-        const district = item['Distrito_Localização'] || 'Não Especificado';
-        if (!districtDistribution[district]) {
-            districtDistribution[district] = 0;
-        }
-        districtDistribution[district]++;
+        timelineData[year].value += value * quantity;
+        timelineData[year].count += quantity;
     });
     
     state.indicators = {
@@ -445,24 +451,34 @@ function calculateIndicators() {
         totalItems,
         statusDistribution,
         avgStatus,
-        criticalItems,
+        criticalItems: criticalItems.length,
         categoryDistribution,
         districtDistribution,
+        timelineData,
         dataLength: data.length
     };
 }
 
-// ===== INICIALIZAÇÃO DO DASHBOARD =====
-function initDashboard() {
-    if (elements.backToHomeBtn) {
-        elements.backToHomeBtn.addEventListener('click', goBackToHome);
+// ===== VALIDAÇÃO DE DADOS =====
+function validateData(data) {
+    if (!Array.isArray(data) || data.length === 0) {
+        return { valid: false, message: 'Dados inválidos ou vazios' };
     }
-}
-
-function goBackToHome() {
-    elements.dashboardPage.style.display = 'none';
-    elements.uploadPage.style.display = 'block';
-    clearSelectedFile();
+    
+    // Verificar campos mínimos
+    const sampleItem = data[0];
+    const requiredFields = ['ID_Item', 'Nome_Item', 'Categoria', 'Valor_Aquisição'];
+    
+    for (const field of requiredFields) {
+        if (!sampleItem.hasOwnProperty(field)) {
+            return { 
+                valid: false, 
+                message: `Campo obrigatório "${field}" não encontrado` 
+            };
+        }
+    }
+    
+    return { valid: true, message: `Dados válidos: ${data.length} itens processados` };
 }
 
 // ===== ATUALIZAÇÃO DO DASHBOARD =====
@@ -494,14 +510,20 @@ function updateIndicators() {
     if (elements.criticalItems) {
         elements.criticalItems.textContent = indicators.criticalItems || 0;
     }
+    
+    // Atualizar subtítulo
+    if (elements.dashboardSubtitle) {
+        const itemCount = state.filteredData ? state.filteredData.length : 0;
+        const totalCount = state.processedData ? state.processedData.length : 0;
+        const filterText = itemCount !== totalCount ? ` (${itemCount} de ${totalCount} itens)` : ` (${totalCount} itens)`;
+        elements.dashboardSubtitle.textContent = `Análise Patrimonial${filterText}`;
+    }
 }
 
 function updateFilterOptions() {
     if (!state.processedData) return;
     
     const data = state.processedData;
-    
-    // Coletar valores únicos
     const categories = new Set();
     const districts = new Set();
     const responsibles = new Set();
@@ -514,17 +536,15 @@ function updateFilterOptions() {
         if (item['Uso_Actual']) uses.add(item['Uso_Actual']);
     });
     
-    // Atualizar selects
-    updateSelectOptions(elements.categoryFilter, categories, 'Todas as Categorias');
-    updateSelectOptions(elements.districtFilter, districts, 'Todos os Distritos');
-    updateSelectOptions(elements.responsibleFilter, responsibles, 'Todos os Responsáveis');
-    updateSelectOptions(elements.useFilter, uses, 'Todos os Usos');
+    updateSelect(elements.categoryFilter, categories, 'Todas as Categorias');
+    updateSelect(elements.districtFilter, districts, 'Todos os Distritos');
+    updateSelect(elements.responsibleFilter, responsibles, 'Todos os Responsáveis');
+    updateSelect(elements.useFilter, uses, 'Todos os Usos');
 }
 
-function updateSelectOptions(selectElement, valuesSet, defaultText) {
+function updateSelect(selectElement, valuesSet, defaultText) {
     if (!selectElement) return;
     
-    // Salvar valor selecionado atual
     const currentValue = selectElement.value;
     
     // Limpar opções (exceto a primeira)
@@ -532,27 +552,22 @@ function updateSelectOptions(selectElement, valuesSet, defaultText) {
         selectElement.remove(1);
     }
     
-    // Adicionar novas opções
-    const valuesArray = Array.from(valuesSet).sort();
-    valuesArray.forEach(value => {
+    // Ordenar e adicionar valores
+    Array.from(valuesSet).sort().forEach(value => {
         const option = document.createElement('option');
         option.value = value;
         option.textContent = value;
         selectElement.appendChild(option);
     });
     
-    // Restaurar valor selecionado se ainda existir
-    if (currentValue && valuesArray.includes(currentValue)) {
+    // Restaurar valor selecionado
+    if (currentValue && Array.from(valuesSet).includes(currentValue)) {
         selectElement.value = currentValue;
-    } else {
-        selectElement.value = 'all';
     }
 }
 
 // ===== CRIAÇÃO DE GRÁFICOS =====
 function createCharts() {
-    if (!state.processedData) return;
-    
     // Destruir gráficos existentes
     if (state.charts) {
         Object.values(state.charts).forEach(chart => {
@@ -565,10 +580,12 @@ function createCharts() {
     state.charts = {};
     
     // Criar gráficos
-    createCategoryChart();
-    createStatusChart();
-    createDistrictChart();
-    createTimelineChart();
+    setTimeout(() => {
+        createCategoryChart();
+        createStatusChart();
+        createDistrictChart();
+        createTimelineChart();
+    }, 100);
 }
 
 function createCategoryChart() {
@@ -581,7 +598,6 @@ function createCategoryChart() {
     const labels = Object.keys(categories);
     const data = labels.map(label => categories[label].value);
     
-    // Cores para as categorias
     const backgroundColors = [
         '#3B82F6', '#10B981', '#F97316', '#8B5CF6', '#EF4444',
         '#06B6D4', '#84CC16', '#F59E0B', '#EC4899', '#6366F1'
@@ -604,12 +620,18 @@ function createCategoryChart() {
                 legend: {
                     position: 'right',
                     labels: {
-                        padding: 20
+                        padding: 20,
+                        font: {
+                            size: 11
+                        }
                     }
                 },
                 title: {
                     display: true,
-                    text: 'Distribuição de Valor por Categoria'
+                    text: 'Distribuição de Valor por Categoria',
+                    font: {
+                        size: 14
+                    }
                 }
             }
         }
@@ -626,7 +648,6 @@ function createStatusChart() {
     const labels = Object.keys(statusDist);
     const data = labels.map(label => statusDist[label]);
     
-    // Cores baseadas no status
     const backgroundColors = labels.map(label => {
         switch(label) {
             case 'Bom': return '#10B981';
@@ -653,7 +674,10 @@ function createStatusChart() {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Distribuição por Estado de Conservação'
+                    text: 'Distribuição por Estado de Conservação',
+                    font: {
+                        size: 14
+                    }
                 }
             },
             scales: {
@@ -707,7 +731,10 @@ function createDistrictChart() {
                 },
                 title: {
                     display: true,
-                    text: 'Distribuição de Itens por Distrito'
+                    text: 'Distribuição de Itens por Distrito',
+                    font: {
+                        size: 14
+                    }
                 }
             }
         }
@@ -719,33 +746,18 @@ function createTimelineChart() {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const data = state.processedData || [];
+    const timeline = state.indicators.timelineData || {};
     
-    // Agrupar por ano de aquisição
-    const yearGroups = {};
-    data.forEach(item => {
-        const date = item['Data_Aquisição'];
-        if (!date) return;
-        
-        const year = date.substring(0, 4); // Extrair ano
-        const value = parseFloat(item['Valor_Aquisição']) || 0;
-        
-        if (!yearGroups[year]) {
-            yearGroups[year] = 0;
-        }
-        yearGroups[year] += value;
-    });
-    
-    const labels = Object.keys(yearGroups).sort();
-    const values = labels.map(year => yearGroups[year]);
+    const labels = Object.keys(timeline).sort();
+    const data = labels.map(year => timeline[year].value);
     
     state.charts.timeline = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Valor das Aquisições',
-                data: values,
+                label: 'Valor das Aquisições (MZN)',
+                data: data,
                 borderColor: '#3B82F6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 borderWidth: 2,
@@ -759,7 +771,10 @@ function createTimelineChart() {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Aquisições ao Longo do Tempo'
+                    text: 'Aquisições ao Longo do Tempo',
+                    font: {
+                        size: 14
+                    }
                 }
             },
             scales: {
@@ -793,9 +808,11 @@ function updateCriticalTable() {
     const tbody = elements.criticalTableBody;
     tbody.innerHTML = '';
     
-    if (!state.filteredData) return;
+    if (!state.filteredData) {
+        showEmptyTableMessage(tbody, 6, 'Nenhum dado disponível');
+        return;
+    }
     
-    // Encontrar itens críticos
     const criticalItems = state.filteredData.filter(item => {
         const status = item['Estado_Conservação'];
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -803,36 +820,22 @@ function updateCriticalTable() {
     });
     
     if (criticalItems.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px; color: var(--text-light);">
-                    <i class="fas fa-check-circle" style="color: var(--aprodet-green); font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-                    Nenhum item crítico encontrado
-                </td>
-            </tr>
-        `;
+        showEmptyTableMessage(tbody, 6, 'Nenhum item crítico encontrado', 'check-circle', '#10B981');
         return;
     }
     
-    // Adicionar itens à tabela
     criticalItems.forEach(item => {
         const row = document.createElement('tr');
-        
         const value = parseFloat(item['Valor_Aquisição']) || 0;
-        const formattedValue = new Intl.NumberFormat('pt-PT', {
-            style: 'currency',
-            currency: 'MZN'
-        }).format(value);
         
         row.innerHTML = `
-            <td>${item['ID_Item'] || ''}</td>
-            <td>${item['Nome_Item'] || ''}</td>
-            <td>${item['Categoria'] || ''}</td>
-            <td><span class="status-badge status-bad">${item['Estado_Conservação'] || ''}</span></td>
-            <td>${formattedValue}</td>
-            <td>${item['Localização_Item'] || ''}</td>
+            <td>${escapeHtml(item['ID_Item'] || '')}</td>
+            <td>${escapeHtml(item['Nome_Item'] || '')}</td>
+            <td>${escapeHtml(item['Categoria'] || '')}</td>
+            <td><span class="status-badge status-bad">${escapeHtml(item['Estado_Conservação'] || '')}</span></td>
+            <td>${formatCurrency(value)}</td>
+            <td>${escapeHtml(item['Localização_Item'] || '')}</td>
         `;
-        
         tbody.appendChild(row);
     });
 }
@@ -843,7 +846,10 @@ function updateAllItemsTable() {
     const tbody = elements.allItemsTableBody;
     tbody.innerHTML = '';
     
-    if (!state.filteredData) return;
+    if (!state.filteredData) {
+        showEmptyTableMessage(tbody, 6, 'Nenhum dado disponível');
+        return;
+    }
     
     // Aplicar paginação
     const startIndex = (state.currentPage - 1) * state.itemsPerPage;
@@ -851,54 +857,65 @@ function updateAllItemsTable() {
     const paginatedItems = state.filteredData.slice(startIndex, endIndex);
     
     if (paginatedItems.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px; color: var(--text-light);">
-                    <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-                    Nenhum item encontrado com os filtros atuais
-                </td>
-            </tr>
-        `;
+        showEmptyTableMessage(tbody, 6, 'Nenhum item encontrado', 'search', '#6B7280');
         return;
     }
     
-    // Adicionar itens à tabela
     paginatedItems.forEach(item => {
         const row = document.createElement('tr');
-        
         const value = parseFloat(item['Valor_Aquisição']) || 0;
-        const formattedValue = new Intl.NumberFormat('pt-PT', {
-            style: 'currency',
-            currency: 'MZN'
-        }).format(value);
-        
-        // Determinar classe de status
         const status = item['Estado_Conservação'] || '';
         let statusClass = 'status-regular';
         if (status === 'Bom') statusClass = 'status-good';
         else if (status === 'Ruim') statusClass = 'status-bad';
         
         row.innerHTML = `
-            <td>${item['ID_Item'] || ''}</td>
-            <td>${item['Nome_Item'] ? item['Nome_Item'].substring(0, 30) + (item['Nome_Item'].length > 30 ? '...' : '') : ''}</td>
-            <td>${item['Categoria'] || ''}</td>
-            <td><span class="status-badge ${statusClass}">${status}</span></td>
-            <td>${formattedValue}</td>
-            <td>${item['Distrito_Localização'] || ''}</td>
+            <td>${escapeHtml(item['ID_Item'] || '')}</td>
+            <td>${escapeHtml(truncateText(item['Nome_Item'] || '', 30))}</td>
+            <td>${escapeHtml(item['Categoria'] || '')}</td>
+            <td><span class="status-badge ${statusClass}">${escapeHtml(status)}</span></td>
+            <td>${formatCurrency(value)}</td>
+            <td>${escapeHtml(item['Distrito_Localização'] || '')}</td>
         `;
-        
         tbody.appendChild(row);
     });
+}
+
+function showEmptyTableMessage(tbody, colSpan, message, icon = 'info-circle', color = '#6B7280') {
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="${colSpan}" style="text-align: center; padding: 40px 20px;">
+                <i class="fas fa-${icon}" style="font-size: 3rem; color: ${color}; margin-bottom: 15px; display: block;"></i>
+                <h4 style="color: ${color}; margin-bottom: 10px;">${message}</h4>
+                <p style="color: #9CA3AF; font-size: 0.9rem;">
+                    ${state.filteredData && state.filteredData.length > 0 ? 
+                        'Tente ajustar os filtros' : 
+                        'Carregue um arquivo ou use os dados de demonstração'}
+                </p>
+            </td>
+        </tr>
+    `;
 }
 
 // ===== FILTROS =====
 function applyFilters() {
     if (!state.processedData) return;
     
-    state.filteredData = [...state.processedData];
+    // Coletar valores dos filtros
+    state.filters.category = elements.categoryFilter ? elements.categoryFilter.value : 'all';
+    state.filters.district = elements.districtFilter ? elements.districtFilter.value : 'all';
+    state.filters.status = elements.statusFilter ? elements.statusFilter.value : 'all';
+    state.filters.responsible = elements.responsibleFilter ? elements.responsibleFilter.value : 'all';
+    state.filters.use = elements.useFilter ? elements.useFilter.value : 'all';
     
-    // Aplicar filtros sequencialmente
-    state.filteredData = state.filteredData.filter(item => {
+    // Valores numéricos
+    state.filters.minValue = elements.minValue && elements.minValue.value ? 
+        parseFloat(elements.minValue.value) : null;
+    state.filters.maxValue = elements.maxValue && elements.maxValue.value ? 
+        parseFloat(elements.maxValue.value) : null;
+    
+    // Aplicar filtros
+    state.filteredData = state.processedData.filter(item => {
         // Filtro de categoria
         if (state.filters.category !== 'all' && state.filters.category !== item['Categoria']) {
             return false;
@@ -914,15 +931,6 @@ function applyFilters() {
             return false;
         }
         
-        // Filtro de valor
-        const value = parseFloat(item['Valor_Aquisição']) || 0;
-        if (state.filters.minValue !== null && value < state.filters.minValue) {
-            return false;
-        }
-        if (state.filters.maxValue !== null && value > state.filters.maxValue) {
-            return false;
-        }
-        
         // Filtro de responsável
         if (state.filters.responsible !== 'all' && state.filters.responsible !== item['Responsável_Item']) {
             return false;
@@ -933,18 +941,29 @@ function applyFilters() {
             return false;
         }
         
+        // Filtro de valor
+        const value = parseFloat(item['Valor_Aquisição']) || 0;
+        if (state.filters.minValue !== null && value < state.filters.minValue) {
+            return false;
+        }
+        if (state.filters.maxValue !== null && value > state.filters.maxValue) {
+            return false;
+        }
+        
         // Filtro de busca
         if (state.searchTerm && state.searchTerm.trim() !== '') {
             const searchLower = state.searchTerm.toLowerCase();
-            const searchFields = [
+            const searchableFields = [
                 item['ID_Item'],
                 item['Nome_Item'],
                 item['Categoria'],
                 item['Descrição'],
-                item['Localização_Item']
+                item['Localização_Item'],
+                item['Distrito_Localização'],
+                item['Responsável_Item']
             ].filter(field => field).map(field => field.toLowerCase());
             
-            if (!searchFields.some(field => field.includes(searchLower))) {
+            if (!searchableFields.some(field => field.includes(searchLower))) {
                 return false;
             }
         }
@@ -955,28 +974,29 @@ function applyFilters() {
     // Recalcular indicadores para dados filtrados
     calculateIndicatorsForFilteredData();
     
+    // Resetar paginação
+    state.currentPage = 1;
+    
     // Atualizar dashboard
-    updateIndicators();
-    updateTables();
+    updateDashboard();
 }
 
 function calculateIndicatorsForFilteredData() {
-    if (!state.filteredData) {
-        state.indicators = {};
-        return;
-    }
+    if (!state.filteredData) return;
     
-    // Recalcular apenas com dados filtrados
-    const tempData = state.filteredData;
-    const tempProcessedData = state.processedData;
+    // Salvar dados originais
+    const originalData = state.processedData;
     
-    state.processedData = tempData;
+    // Calcular indicadores com dados filtrados
+    state.processedData = state.filteredData;
     calculateIndicators();
-    state.processedData = tempProcessedData;
+    
+    // Restaurar dados originais
+    state.processedData = originalData;
 }
 
 function resetFilters() {
-    // Resetar valores dos filtros
+    // Resetar estado
     state.filters = {
         category: 'all',
         district: 'all',
@@ -989,14 +1009,14 @@ function resetFilters() {
     state.searchTerm = '';
     state.currentPage = 1;
     
-    // Resetar controles da interface
+    // Resetar controles
     if (elements.categoryFilter) elements.categoryFilter.value = 'all';
     if (elements.districtFilter) elements.districtFilter.value = 'all';
     if (elements.statusFilter) elements.statusFilter.value = 'all';
-    if (elements.minValue) elements.minValue.value = '';
-    if (elements.maxValue) elements.maxValue.value = '';
     if (elements.responsibleFilter) elements.responsibleFilter.value = 'all';
     if (elements.useFilter) elements.useFilter.value = 'all';
+    if (elements.minValue) elements.minValue.value = '';
+    if (elements.maxValue) elements.maxValue.value = '';
     if (elements.searchInput) elements.searchInput.value = '';
     
     // Resetar dados filtrados
@@ -1009,49 +1029,401 @@ function resetFilters() {
     updateDashboard();
 }
 
-function applySearch() {
-    if (elements.searchInput) {
-        state.searchTerm = elements.searchInput.value;
-        applyFilters();
-    }
+// ===== NAVEGAÇÃO =====
+function switchToDashboard() {
+    elements.uploadPage.style.display = 'none';
+    elements.dashboardPage.style.display = 'block';
+    
+    // Adicionar animação
+    elements.dashboardPage.style.opacity = '0';
+    elements.dashboardPage.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        elements.dashboardPage.style.transition = 'all 0.5s ease';
+        elements.dashboardPage.style.opacity = '1';
+        elements.dashboardPage.style.transform = 'translateY(0)';
+    }, 50);
+}
+
+function goBackToHome() {
+    elements.dashboardPage.style.display = 'none';
+    elements.uploadPage.style.display = 'block';
+    clearSelectedFile();
 }
 
 // ===== EXPORTAÇÃO =====
 function exportToPDF() {
-    showLoading('Gerando PDF...');
+    showLoading('Gerando relatório PDF...');
     
-    setTimeout(() => {
-        alert('Funcionalidade de exportação PDF será implementada em breve!');
+    // Verificar se jsPDF está disponível
+    if (typeof window.jspdf !== 'undefined') {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Adicionar conteúdo básico
+            doc.setFontSize(20);
+            doc.text('RELATÓRIO APRODET', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-PT')}`, 20, 40);
+            doc.text(`Hora: ${new Date().toLocaleTimeString('pt-PT')}`, 20, 50);
+            
+            // Adicionar indicadores
+            doc.setFontSize(14);
+            doc.text('INDICADORES PRINCIPAIS', 20, 70);
+            
+            doc.setFontSize(10);
+            doc.text(`• Valor Total: ${formatCurrency(state.indicators.totalValue || 0)}`, 30, 85);
+            doc.text(`• Total de Itens: ${state.indicators.totalItems || 0}`, 30, 95);
+            doc.text(`• Estado Médio: ${state.indicators.avgStatus || 0}%`, 30, 105);
+            doc.text(`• Itens Críticos: ${state.indicators.criticalItems || 0}`, 30, 115);
+            
+            // Salvar PDF
+            doc.save(`relatorio_aprodet_${new Date().getTime()}.pdf`);
+            
+            hideLoading();
+            showNotification('PDF gerado com sucesso!', 'success');
+            
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            hideLoading();
+            showNotification('Erro ao gerar PDF. Tente novamente.', 'error');
+        }
+    } else {
         hideLoading();
-    }, 1000);
+        showNotification('Funcionalidade PDF não disponível no momento.', 'info');
+    }
 }
 
 function exportToCSV() {
     if (!state.filteredData || state.filteredData.length === 0) {
-        alert('Nenhum dado para exportar!');
+        showNotification('Nenhum dado para exportar!', 'warning');
         return;
     }
     
-    showLoading('Gerando CSV...');
+    showLoading('Gerando arquivo CSV...');
     
     try {
-        // Criar cabeçalhos
-        const headers = REQUIRED_COLUMNS;
+        // Converter dados para CSV
+        const headers = Object.keys(state.filteredData[0]);
         const csvRows = [];
         
-        // Adicionar cabeçalhos
+        // Cabeçalhos
         csvRows.push(headers.join(','));
         
-        // Adicionar dados
+        // Dados
         state.filteredData.forEach(item => {
             const row = headers.map(header => {
-                const value = item[header] || '';
-                // Escapar vírgulas e aspas
-                return `"${String(value).replace(/"/g, '""')}"`;
+                const value = item[header];
+                const escaped = (value === null || value === undefined) ? '' : String(value);
+                return `"${escaped.replace(/"/g, '""')}"`;
             });
             csvRows.push(row.join(','));
         });
         
-        // Criar blob e download
+        // Criar e baixar arquivo
         const csvString = csvRows.join('\n');
         const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        const fileName = state.currentFile 
+            ? `aprodet_${state.currentFile.name.replace(/\.[^/.]+$/, '')}_export.csv`
+            : `aprodet_dashboard_${new Date().getTime()}.csv`;
+        
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        hideLoading();
+        showNotification('CSV exportado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao exportar CSV:', error);
+        hideLoading();
+        showNotification('Erro ao exportar CSV. Tente novamente.', 'error');
+    }
+}
+
+function exportReport() {
+    if (!state.indicators || !state.filteredData) {
+        showNotification('Nenhum dado disponível para relatório', 'warning');
+        return;
+    }
+    
+    showLoading('Gerando relatório...');
+    
+    try {
+        const reportContent = generateReportContent();
+        const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        const fileName = `relatorio_aprodet_${new Date().getTime()}.txt`;
+        
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        hideLoading();
+        showNotification('Relatório gerado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao gerar relatório:', error);
+        hideLoading();
+        showNotification('Erro ao gerar relatório.', 'error');
+    }
+}
+
+function generateReportContent() {
+    const indicators = state.indicators;
+    const now = new Date();
+    
+    return `
+RELATÓRIO APRODET - DASHBOARD PATRIMONIAL
+==========================================
+Data de geração: ${now.toLocaleDateString('pt-PT')} ${now.toLocaleTimeString('pt-PT')}
+Arquivo: ${state.currentFile ? state.currentFile.name : 'Dados de demonstração'}
+Itens analisados: ${state.filteredData ? state.filteredData.length : 0}
+
+RESUMO EXECUTIVO
+================
+• Valor Total do Patrimônio: ${formatCurrency(indicators.totalValue || 0)}
+• Total de Itens no Inventário: ${indicators.totalItems || 0}
+• Estado Médio de Conservação: ${indicators.avgStatus || 0}%
+• Itens Críticos Identificados: ${indicators.criticalItems || 0}
+
+DISTRIBUIÇÃO POR CATEGORIA
+==========================
+${Object.entries(indicators.categoryDistribution || {}).map(([cat, data]) => 
+    `• ${cat}: ${formatCurrency(data.value)} (${data.count} itens, ${((data.count / indicators.totalItems) * 100).toFixed(1)}%)`
+).join('\n')}
+
+DISTRIBUIÇÃO POR ESTADO
+=======================
+${Object.entries(indicators.statusDistribution || {}).map(([status, count]) => 
+    `• ${status}: ${count} itens (${((count / indicators.totalItems) * 100).toFixed(1)}%)`
+).join('\n')}
+
+DISTRIBUIÇÃO GEOGRÁFICA
+=======================
+${Object.entries(indicators.districtDistribution || {}).map(([district, count]) => 
+    `• ${district}: ${count} itens`
+).join('\n')}
+
+ITENS CRÍTICOS (PRIORIDADE ALTA)
+=================================
+${state.filteredData
+    .filter(item => item['Estado_Conservação'] === 'Ruim' && (parseFloat(item['Valor_Aquisição']) || 0) > 5000)
+    .slice(0, 20)
+    .map((item, index) => 
+        `${index + 1}. ${item['ID_Item']} - ${item['Nome_Item']} - ${formatCurrency(parseFloat(item['Valor_Aquisição']) || 0)} - ${item['Localização_Item']}`
+    ).join('\n')}
+
+RECOMENDAÇÕES
+=============
+1. ${indicators.criticalItems > 0 ? 
+    `Priorizar manutenção/reposição de ${indicators.criticalItems} itens críticos` : 
+    'Nenhum item crítico requer atenção imediata'}
+2. ${indicators.avgStatus < 70 ? 
+    `Implementar plano de manutenção preventiva (estado médio: ${indicators.avgStatus}%)` :
+    'Estado do patrimônio dentro dos parâmetros aceitáveis'}
+3. Revisar periodicamente itens com mais de 5 anos de uso
+4. Considerar seguro para itens de alto valor
+
+ANÁLISE TEMPORAL
+================
+${Object.entries(indicators.timelineData || {}).sort((a, b) => a[0] - b[0]).map(([year, data]) => 
+    `• ${year}: ${formatCurrency(data.value)} em ${data.count} aquisições`
+).join('\n')}
+
+--- FIM DO RELATÓRIO ---
+Gerado pelo APRODET Dashboard v1.0
+`;
+}
+
+// ===== UTILITÁRIOS =====
+function showLoading(message) {
+    if (elements.loadingOverlay && elements.loadingText) {
+        elements.loadingText.textContent = message;
+        elements.loadingOverlay.style.display = 'flex';
+        state.isLoading = true;
+    }
+}
+
+function hideLoading() {
+    if (elements.loadingOverlay) {
+        elements.loadingOverlay.style.display = 'none';
+        state.isLoading = false;
+    }
+}
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-PT', {
+        style: 'currency',
+        currency: 'MZN',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value || 0);
+}
+
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function updateCurrentDate() {
+    const now = new Date();
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    const dateString = now.toLocaleDateString('pt-PT', options);
+    
+    const dateElement = document.getElementById('currentDate');
+    if (dateElement) {
+        dateElement.textContent = dateString;
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Criar elemento de notificação
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        <span>${message}</span>
+        <button class="notification-close"><i class="fas fa-times"></i></button>
+    `;
+    
+    // Estilos da notificação
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F97316' : '#3B82F6'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    // Adicionar ao documento
+    document.body.appendChild(notification);
+    
+    // Botão fechar
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', () => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    });
+    
+    // Remover automaticamente após 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 5000);
+    
+    // Adicionar estilos de animação se não existirem
+    if (!document.getElementById('notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            .notification-close {
+                background: none;
+                border: none;
+                color: white;
+                cursor: pointer;
+                padding: 0;
+                margin-left: 10px;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+// ===== LOCAL STORAGE =====
+function saveDataToStorage() {
+    try {
+        const dataToSave = {
+            indicators: state.indicators,
+            filters: state.filters,
+            lastUpdated: new Date().getTime()
+        };
+        localStorage.setItem('aprodetDashboardData', JSON.stringify(dataToSave));
+    } catch (error) {
+        console.warn('Não foi possível salvar dados no localStorage:', error);
+    }
+}
+
+function checkForSavedData() {
+    try {
+        const savedData = localStorage.getItem('aprodetDashboardData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            const oneDayAgo = new Date().getTime() - (24 * 60 * 60 * 1000);
+            
+            if (data.lastUpdated > oneDayAgo) {
+                // Dados são recentes (menos de 24 horas)
+                state.indicators = data.indicators || {};
+                state.filters = data.filters || {};
+                
+                // Mostrar notificação
+                setTimeout(() => {
+                    showNotification('Dados anteriores encontrados. Carregue um novo arquivo ou use dados de demonstração.', 'info');
+                }, 1000);
+            }
+        }
+    } catch (error) {
+        console.warn('Erro ao recuperar dados salvos:', error);
+    }
+}
+
+// ===== PREVENIR SAÍDA ACIDENTAL =====
+window.addEventListener('beforeunload', function(e) {
+    if (state.isLoading) {
+        e.preventDefault();
+        e.returnValue = 'A análise ainda está em progresso. Tem certeza que deseja sair?';
+        return e.returnValue;
+    }
+});
+
+// ===== INICIALIZAÇÃO FINAL =====
+// Garantir que todos os elementos estão prontos
+setTimeout(() => {
+    if (!elements.uploadPage && document.getElementById('uploadPage')) {
+        initializeElements();
+        setupEventListeners();
+    }
+}, 100);
