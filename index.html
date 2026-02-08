@@ -88,6 +88,10 @@
             text-align: right;
         }
         
+        .dashboard-title-container {
+            margin-bottom: 5px;
+        }
+        
         .dashboard-title-header {
             font-size: 24px;
             font-weight: 600;
@@ -418,7 +422,7 @@
         }
         
         .kpi-card {
-            background: rgba(147, 197, 253, 0.15); /* Azul transparente combinando com logo */
+            background: rgba(147, 197, 253, 0.15);
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -638,159 +642,118 @@
             background-color: #f0f8ff;
         }
         
-        /* ===== SUMMARY SECTION ===== */
-        .summary-section {
-            background-color: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 40px;
-        }
-        
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .summary-item {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+        /* ===== NOVO ESTILO PARA RECOMENDAÇÕES ===== */
+        .recommendations-container {
             padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
         }
         
-        .summary-icon {
-            width: 50px;
-            height: 50px;
-            background-color: #3498db;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
+        .recommendations-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
         }
         
-        .summary-text h4 {
+        .recommendations-header h3 {
             color: #2c3e50;
-            margin-bottom: 5px;
-        }
-        
-        .summary-text p {
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-        
-        /* ===== RECOMMENDATIONS ===== */
-        .recommendations-section {
-            background-color: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 40px;
-        }
-        
-        .recommendations-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .recommendation-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-        
-        .recommendation-item.success {
-            border-left: 4px solid #2ecc71;
-        }
-        
-        .recommendation-item.warning {
-            border-left: 4px solid #f39c12;
-        }
-        
-        .recommendation-item.error {
-            border-left: 4px solid #e74c3c;
-        }
-        
-        .recommendation-item.info {
-            border-left: 4px solid #3498db;
-        }
-        
-        .recommendation-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            gap: 10px;
+            font-size: 1.4rem;
         }
         
-        .recommendation-item.success .recommendation-icon {
-            background-color: #d5f4e6;
-            color: #27ae60;
-        }
-        
-        .recommendation-item.warning .recommendation-icon {
-            background-color: #fef5e7;
-            color: #f39c12;
-        }
-        
-        .recommendation-item.error .recommendation-icon {
-            background-color: #fde8e8;
-            color: #e74c3c;
-        }
-        
-        .recommendation-item.info .recommendation-icon {
-            background-color: #e3f2fd;
+        .recommendations-header h3 i {
             color: #3498db;
         }
         
-        .recommendation-content {
-            flex-grow: 1;
+        .recommendations-subtitle {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-style: italic;
         }
         
-        .recommendation-content p {
+        .recommendation-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .recommendation-card.error {
+            border-left-color: #f44336;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+        }
+        
+        .recommendation-card.warning {
+            border-left-color: #ff9800;
+            background: linear-gradient(135deg, #fffaf0 0%, #fff 100%);
+        }
+        
+        .recommendation-card.success {
+            border-left-color: #4caf50;
+            background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+        }
+        
+        .recommendation-card.info {
+            border-left-color: #3498db;
+            background: linear-gradient(135deg, #f0f9ff 0%, #fff 100%);
+        }
+        
+        .recommendation-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        
+        .recommendation-content h4 {
+            margin: 0 0 12px 0;
             color: #2c3e50;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.4;
         }
         
-        .priority-badge {
+        .recommendation-description {
+            color: #546e7a;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .priority-tag {
             display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .priority-badge.success {
-            background-color: #d4edda;
-            color: #155724;
+        .priority-tag i {
+            margin-right: 6px;
         }
         
-        .priority-badge.warning {
-            background-color: #fff3cd;
-            color: #856404;
+        .priority-alta {
+            background-color: #f44336;
+            color: white;
         }
         
-        .priority-badge.error {
-            background-color: #f8d7da;
-            color: #721c24;
+        .priority-media {
+            background-color: #ff9800;
+            color: white;
         }
         
-        .priority-badge.info {
-            background-color: #d1ecf1;
-            color: #0c5460;
+        .priority-baixa {
+            background-color: #4caf50;
+            color: white;
         }
         
         /* ===== PAGINATION ===== */
@@ -836,6 +799,53 @@
         .btn-pagination.disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        
+        /* ===== SUMMARY SECTION ===== */
+        .summary-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .summary-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+        
+        .summary-text h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .summary-text p {
+            color: #7f8c8d;
+            font-size: 14px;
         }
         
         /* ===== FOOTER ===== */
@@ -969,7 +979,7 @@
         }
         
         /* ===== MODAL ===== */
-        .modal {
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -1111,6 +1121,14 @@
                 gap: 15px;
                 align-items: flex-start;
             }
+            
+            .recommendations-container {
+                padding: 15px;
+            }
+            
+            .recommendation-card {
+                padding: 15px;
+            }
         }
         
         /* ===== FILTROS REMOVIDOS ===== */
@@ -1154,10 +1172,12 @@
             </div>
             <div class="header-right">
                 <!-- APRODET Dashboard acima do subtítulo -->
-                <div class="dashboard-title-header">APRODET Dashboard</div>
+                <div class="dashboard-title-container">
+                    <div class="dashboard-title-header">APRODET Dashboard</div>
+                </div>
                 <div class="header-info" id="currentFileInfo">Analisando: Aprodet_Filled_Data.xlsx</div>
                 <!-- Data/hora com fonte menor -->
-                <div class="date-time" id="currentDate">domingo, 8 de fevereiro de 2026 às 22:14</div>
+                <div class="date-time" id="currentDate">carregando data...</div>
             </div>
         </div>
     </div>
@@ -1472,10 +1492,9 @@
                 </div>
             </div>
 
-            <!-- Recommendations Section -->
+            <!-- Recommendations Section (NOVO DESIGN) -->
             <div class="recommendations-section">
-                <h2 class="section-title">Recomendações e Ações</h2>
-                <div id="recommendationsContent" class="recommendations-list">
+                <div id="recommendationsContent">
                     <!-- Conteúdo será preenchido por JavaScript -->
                 </div>
             </div>
@@ -1508,11 +1527,11 @@
     </div>
 
     <!-- Item Details Modal -->
-    <div id="itemModal" class="modal">
+    <div id="itemModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalTitle">Detalhes do Item</h3>
-                <button class="modal-close" onclick="document.getElementById('itemModal').style.display='none'">
+                <button class="modal-close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
