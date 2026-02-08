@@ -52,32 +52,6 @@
             align-items: center;
         }
         
-        /* Logo APD - NOVO */
-        .apd-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 12px 18px;
-            border-radius: 8px;
-            margin-right: 20px;
-        }
-        
-        .apd-text {
-            font-size: 28px;
-            font-weight: 800;
-            color: #3498db;
-            letter-spacing: 1.5px;
-        }
-        
-        .apd-label {
-            font-size: 11px;
-            color: #ecf0f1;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 3px;
-        }
-        
         .header-left {
             display: flex;
             align-items: center;
@@ -347,19 +321,10 @@
             margin-bottom: 10px;
         }
         
-        /* Ajuste para valor total com números longos */
-        .patrimony-value {
+        /* Ajuste para valor total com números longos - NOVO */
+        .smaller-font {
             font-size: 19px !important;
             line-height: 1.2;
-            word-break: break-word;
-        }
-        
-        .patrimony-value.font-small {
-            font-size: 17px !important;
-        }
-        
-        .patrimony-value.font-very-small {
-            font-size: 15px !important;
         }
         
         .currency-symbol {
@@ -886,18 +851,37 @@
             box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        /* @Falcandra Data Consulting - NOVO */
-        .consulting-text {
-            font-size: 16px;
-            font-weight: 600;
-            color: #3498db;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-        
         .footer p {
             opacity: 0.8;
             font-size: 14px;
+        }
+        
+        /* ===== REQUIRED FIELDS ===== */
+        .required-fields {
+            margin-top: 40px;
+        }
+        
+        .required-fields h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .field-tag {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
         }
         
         /* ===== LOADING OVERLAY ===== */
@@ -1072,34 +1056,6 @@
             color: #34495e;
         }
         
-        /* ===== REQUIRED FIELDS ===== */
-        .required-fields {
-            margin-top: 40px;
-        }
-        
-        .required-fields h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .fields-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .field-tag {
-            background-color: #e3f2fd;
-            color: #1565c0;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            text-align: center;
-        }
-        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .header-content {
@@ -1112,11 +1068,6 @@
                 flex-direction: column;
                 text-align: center;
                 gap: 15px;
-            }
-            
-            .apd-logo {
-                margin-right: 0;
-                margin-bottom: 10px;
             }
             
             .upload-card {
@@ -1157,6 +1108,30 @@
                 align-items: flex-start;
             }
         }
+        
+        /* ===== FILTROS REMOVIDOS ===== */
+        .value-filter-controls {
+            display: none !important;
+        }
+        
+        /* ===== FALCANDRA BRANDING ===== */
+        .falcandra-branding {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .falcandra-branding hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+        }
+        
+        .falcandra-branding p {
+            font-size: 14px;
+            color: #3498db;
+            font-weight: 600;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -1164,12 +1139,6 @@
     <header class="header">
         <div class="container header-content">
             <div class="header-left">
-                <!-- Logotipo APD -->
-                <div class="apd-logo">
-                    <div class="apd-text">APD</div>
-                    <div class="apd-label">Associação</div>
-                </div>
-                
                 <div class="header-title">
                     <h1>APRODET Dashboard</h1>
                     <h2>Análise Patrimonial</h2>
@@ -1270,7 +1239,7 @@
             <!-- KPI Cards -->
             <div class="kpi-cards">
                 <div class="kpi-card">
-                    <div id="totalValue" class="kpi-value patrimony-value">
+                    <div id="totalValue" class="kpi-value">
                         <span class="currency-symbol">MZN</span> 0,00
                     </div>
                     <div class="kpi-label">Valor Total do Patrimônio</div>
@@ -1296,7 +1265,7 @@
                 </div>
             </div>
 
-            <!-- Filters Section -->
+            <!-- Filters Section - SEM FILTROS DE VALOR -->
             <div class="filters-section">
                 <h2 class="section-title">Filtros Avançados</h2>
                 <div class="filters-grid">
@@ -1363,7 +1332,7 @@
 
             <!-- Charts Section -->
             <div class="charts-section">
-                <!-- Estado de Conservação - Barras Horizontais -->
+                <!-- Estado de Conservação - Barras Horizontais (SEM LEGENDA) -->
                 <div class="chart-container">
                     <h3>Estado de Conservação</h3>
                     <div class="chart-wrapper">
@@ -1376,7 +1345,7 @@
                     </div>
                 </div>
                 
-                <!-- Aquisições ao Longo do Tempo -->
+                <!-- Aquisições ao Longo do Tempo (SEM LEGENDA) -->
                 <div class="chart-container">
                     <h3>Aquisições ao Longo do Tempo</h3>
                     <div class="chart-wrapper">
@@ -1389,7 +1358,7 @@
                     </div>
                 </div>
                 
-                <!-- Valor por Categoria -->
+                <!-- Valor por Categoria (COM LEGENDA CIRCULAR) -->
                 <div class="chart-container">
                     <h3>Valor por Categoria (MZN)</h3>
                     <div class="chart-wrapper">
@@ -1402,7 +1371,7 @@
                     </div>
                 </div>
                 
-                <!-- Distribuição por Distrito -->
+                <!-- Distribuição por Distrito (COM LEGENDA CIRCULAR) -->
                 <div class="chart-container">
                     <h3>Distribuição por Distrito</h3>
                     <div class="chart-wrapper">
@@ -1512,8 +1481,7 @@
             
             <!-- Footer -->
             <div class="footer">
-                <!-- @Falcandra Data Consulting -->
-                <div class="consulting-text">@Falcandra Data Consulting</div>
+                <!-- @Falcandra Data Consulting será adicionado por JavaScript -->
                 <p id="lastUpdate">Dashboard APRODET - Análise Patrimonial | Última atualização: --/--/---- --:--</p>
                 <p><strong>Processados:</strong> <span id="processedItems">0</span> itens | <strong>Modo:</strong> <span id="analysisMode">Demonstração</span></p>
             </div>
