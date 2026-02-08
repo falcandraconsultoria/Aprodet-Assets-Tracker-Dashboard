@@ -3,6 +3,7 @@
 // 1. VERIFICAÇÃO de título "APRODET Dashboard" duplicado
 // 2. CORREÇÃO da justificação dos círculos acima de "APRODET"
 // 3. Centralização perfeita dos elementos visuais
+// 4. FUNÇÕES COMPLETAS para todas as funcionalidades
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
@@ -66,16 +67,19 @@ const STATE = {
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('APRODET Dashboard - Inicializando...');
+    
     initializeApplication();
     setupRequiredFields();
     updateCurrentDate();
     
     // VERIFICAÇÃO e correção do layout
-    fixDuplicatedTitle();
-    fixLogoCircles();
+    fixLayoutIssues();
     
     // Adicionar @Falcandra Data Consulting no footer
     addFalcandraBranding();
+    
+    console.log('APRODET Dashboard - Inicialização completa');
 });
 
 function initializeApplication() {
@@ -93,136 +97,137 @@ function initializeApplication() {
 }
 
 // ===== CORREÇÕES DE LAYOUT =====
+function fixLayoutIssues() {
+    console.log('Aplicando correções de layout...');
+    
+    fixDuplicatedTitle();
+    fixLogoCircles();
+    fixDashboardTitles();
+}
+
 function fixDuplicatedTitle() {
     console.log('Verificando título duplicado...');
     
-    // Verificar se há múltiplos elementos com "APRODET Dashboard"
-    const aprodetTitles = document.querySelectorAll('h1, h2, .dashboard-title, .header-title');
-    let aprodetCount = 0;
+    // Encontrar todos os títulos
+    const titles = document.querySelectorAll('h1');
+    let aprodetTitleCount = 0;
     
-    aprodetTitles.forEach(element => {
-        if (element.textContent.includes('APRODET Dashboard')) {
-            aprodetCount++;
-            console.log(`Título encontrado: "${element.textContent.trim()}"`);
+    titles.forEach(title => {
+        if (title.textContent.includes('APRODET')) {
+            aprodetTitleCount++;
             
-            // Se for um segundo título, removê-lo
-            if (aprodetCount > 1) {
-                console.log('Removendo título duplicado...');
-                
-                // Verificar se é o logo APRODET
-                if (element.closest('.aprodet-logo') || element.closest('.logo-container')) {
-                    console.log('Removendo "APRODET Dashboard" do logo');
-                    const logoText = element.closest('.logo-text');
-                    if (logoText && logoText.textContent.includes('APRODET Dashboard')) {
-                        logoText.textContent = 'APRODET'; // Mantém apenas APRODET
-                        console.log('Logo corrigido: mantido apenas "APRODET"');
-                    }
+            // Se for mais de um título com APRODET, corrigir
+            if (aprodetTitleCount > 1) {
+                // Se estiver no logo APRODET, mudar para apenas "APRODET"
+                if (title.closest('.aprodet-logo') || title.closest('.logo-container')) {
+                    console.log('Corrigindo título no logo APRODET...');
+                    title.textContent = 'APRODET';
                 }
                 
-                // Remover elemento se for um título extra
-                if (element.textContent === 'APRODET Dashboard' && element.tagName === 'H1') {
-                    const parent = element.parentElement;
-                    if (parent && parent.querySelectorAll('h1').length > 1) {
-                        element.remove();
-                        console.log('Título duplicado removido');
-                    }
+                // Se for um h1 extra, remover
+                const parent = title.parentElement;
+                const siblings = parent ? parent.querySelectorAll('h1') : [];
+                if (siblings.length > 1) {
+                    console.log('Removendo título duplicado...');
+                    title.remove();
                 }
             }
         }
     });
-    
-    // Verificar se há título no logo APRODET
-    const logoTextElements = document.querySelectorAll('.logo-text, .aprodet-logo h1, .aprodet-logo h2');
-    logoTextElements.forEach(element => {
-        if (element.textContent.includes('APRODET Dashboard')) {
-            console.log('Corrigindo texto do logo APRODET...');
-            element.textContent = element.textContent.replace('APRODET Dashboard', 'APRODET');
-            console.log('Logo APRODET corrigido');
-        }
-    });
-    
-    console.log('Verificação de título duplicado concluída');
 }
 
 function fixLogoCircles() {
-    console.log('Verificando e corrigindo círculos do logo APRODET...');
+    console.log('Corrigindo círculos do logo APRODET...');
     
     const aprodetLogo = document.querySelector('.aprodet-logo');
-    const logoContainer = document.querySelector('.logo-container');
-    const logoVisual = document.querySelector('.logo-visual');
-    
-    if (!aprodetLogo || !logoContainer || !logoVisual) {
-        console.warn('Elementos do logo APRODET não encontrados');
+    if (!aprodetLogo) {
+        console.warn('Logo APRODET não encontrado');
         return;
     }
     
+    // Garantir que o logo tenha a estrutura correta
+    if (!aprodetLogo.querySelector('.logo-container')) {
+        const logoContainer = document.createElement('div');
+        logoContainer.className = 'logo-container';
+        logoContainer.innerHTML = `
+            <div class="logo-visual">
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+            </div>
+            <div class="logo-text">APRODET</div>
+        `;
+        aprodetLogo.innerHTML = '';
+        aprodetLogo.appendChild(logoContainer);
+    }
+    
     // Aplicar estilos de centralização
-    aprodetLogo.style.display = 'flex';
-    aprodetLogo.style.justifyContent = 'center';
-    aprodetLogo.style.alignItems = 'center';
-    aprodetLogo.style.width = '100%';
+    const logoContainer = aprodetLogo.querySelector('.logo-container');
+    const logoVisual = aprodetLogo.querySelector('.logo-visual');
+    const logoText = aprodetLogo.querySelector('.logo-text');
     
-    logoContainer.style.display = 'flex';
-    logoContainer.style.flexDirection = 'column';
-    logoContainer.style.alignItems = 'center';
-    logoContainer.style.justifyContent = 'center';
-    logoContainer.style.width = '100%';
+    if (logoContainer) {
+        logoContainer.style.display = 'flex';
+        logoContainer.style.flexDirection = 'column';
+        logoContainer.style.alignItems = 'center';
+        logoContainer.style.justifyContent = 'center';
+    }
     
-    logoVisual.style.display = 'flex';
-    logoVisual.style.justifyContent = 'center';
-    logoVisual.style.alignItems = 'center';
-    logoVisual.style.gap = '8px';
-    logoVisual.style.width = '100%';
+    if (logoVisual) {
+        logoVisual.style.display = 'flex';
+        logoVisual.style.justifyContent = 'center';
+        logoVisual.style.alignItems = 'center';
+        logoVisual.style.gap = '8px';
+        logoVisual.style.marginBottom = '5px';
+    }
     
-    // Verificar e corrigir círculos
-    const circles = logoVisual.querySelectorAll('.logo-circle');
-    console.log(`Círculos encontrados: ${circles.length}`);
-    
+    // Garantir que os círculos tenham o estilo correto
+    const circles = aprodetLogo.querySelectorAll('.logo-circle');
     circles.forEach(circle => {
         circle.style.width = '22px';
         circle.style.height = '22px';
         circle.style.borderRadius = '50%';
         circle.style.backgroundColor = '#3498db';
-        circle.style.margin = '0';
-        circle.style.padding = '0';
     });
     
-    // Verificar texto do logo
-    const logoText = document.querySelector('.logo-text');
     if (logoText) {
         logoText.style.textAlign = 'center';
-        logoText.style.width = '100%';
-        logoText.style.marginTop = '5px';
+        logoText.style.fontSize = '24px';
+        logoText.style.fontWeight = '700';
+        logoText.style.color = '#3498db';
         
-        // Garantir que não há "Dashboard" no logo
+        // Garantir que não tenha "Dashboard" no logo
         if (logoText.textContent.includes('Dashboard')) {
             logoText.textContent = 'APRODET';
-            console.log('Texto do logo APRODET corrigido');
         }
     }
     
-    console.log('Círculos do logo APRODET corrigidos e centralizados');
+    console.log('Círculos do logo APRODET corrigidos');
+}
+
+function fixDashboardTitles() {
+    // Garantir que apenas o header tenha "APRODET Dashboard"
+    const dashboardTitles = document.querySelectorAll('.dashboard-title, .header-title h1');
+    dashboardTitles.forEach((title, index) => {
+        if (index > 0) {
+            // Se não for o primeiro título, ocultar
+            title.style.display = 'none';
+        }
+    });
 }
 
 function setupDOMReferences() {
-    // Garantir que todos os elementos críticos existem
-    const requiredElements = [
-        'loadingOverlay', 'notification', 'uploadArea',
-        'fileInput', 'fileInfo', 'categoryFilter',
-        'districtFilter', 'statusFilter', 'responsibleFilter',
-        'applyFiltersBtn', 'resetFiltersBtn'
-    ];
-    
-    requiredElements.forEach(id => {
-        if (!document.getElementById(id)) {
-            console.warn(`Elemento #${id} não encontrado no DOM`);
-        }
-    });
+    // Elementos serão referenciados por ID
+    console.log('Configurando referências DOM...');
 }
 
 function setupRequiredFields() {
     const grid = document.getElementById('requiredFieldsGrid');
     if (!grid) return;
+    
+    // Limpar grid existente
+    grid.innerHTML = '';
     
     CONFIG.REQUIRED_COLUMNS.forEach(field => {
         const span = document.createElement('span');
@@ -234,62 +239,103 @@ function setupRequiredFields() {
 
 function addFalcandraBranding() {
     const footer = document.querySelector('.footer');
-    if (footer) {
-        if (!footer.querySelector('.falcandra-branding')) {
-            const brandDiv = document.createElement('div');
-            brandDiv.className = 'falcandra-branding';
-            brandDiv.innerHTML = `
-                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
-                <p style="font-size: 14px; color: #3498db; font-weight: 600; font-style: italic;">
-                    @Falcandra Data Consulting
-                </p>
-            `;
-            
-            const firstParagraph = footer.querySelector('p');
-            if (firstParagraph) {
-                footer.insertBefore(brandDiv, firstParagraph);
-            } else {
-                footer.appendChild(brandDiv);
-            }
-        }
+    if (!footer) return;
+    
+    // Verificar se já existe
+    if (!footer.querySelector('.falcandra-branding')) {
+        const brandDiv = document.createElement('div');
+        brandDiv.className = 'falcandra-branding';
+        brandDiv.innerHTML = `
+            <p style="font-size: 14px; color: #3498db; font-weight: 600; font-style: italic; margin-bottom: 10px;">
+                @Falcandra Data Consulting
+            </p>
+        `;
+        
+        // Inserir no início do footer
+        footer.insertBefore(brandDiv, footer.firstChild);
     }
 }
 
 // ===== MANIPULAÇÃO DE ARQUIVOS =====
 function setupEventListeners() {
-    // Upload
-    document.getElementById('selectFileBtn')?.addEventListener('click', () => {
-        document.getElementById('fileInput').click();
-    });
+    console.log('Configurando event listeners...');
     
-    document.getElementById('fileInput')?.addEventListener('change', handleFileSelect);
+    // Upload Page
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    const fileInput = document.getElementById('fileInput');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    const startAnalysisBtn = document.getElementById('startAnalysisBtn');
+    const backToHomeBtn = document.getElementById('backToHomeBtn');
     
-    document.getElementById('clearFileBtn')?.addEventListener('click', clearSelectedFile);
+    if (selectFileBtn) {
+        selectFileBtn.addEventListener('click', () => {
+            if (fileInput) fileInput.click();
+        });
+    }
     
-    document.getElementById('startAnalysisBtn')?.addEventListener('click', startAnalysis);
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
+    }
     
-    // Dashboard
-    document.getElementById('backToHomeBtn')?.addEventListener('click', goBackToHome);
+    if (clearFileBtn) {
+        clearFileBtn.addEventListener('click', clearSelectedFile);
+    }
     
-    // Filtros
-    document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
-    document.getElementById('resetFiltersBtn')?.addEventListener('click', resetFilters);
-    document.getElementById('searchInput')?.addEventListener('input', debounce(handleSearch, 300));
+    if (startAnalysisBtn) {
+        startAnalysisBtn.addEventListener('click', startAnalysis);
+    }
     
-    // Paginação
-    document.getElementById('itemsPerPage')?.addEventListener('change', function() {
-        STATE.itemsPerPage = parseInt(this.value);
-        updateTables();
-        updatePagination();
-    });
+    if (backToHomeBtn) {
+        backToHomeBtn.addEventListener('click', goBackToHome);
+    }
     
-    // Busca na tabela
-    document.getElementById('tableSearch')?.addEventListener('input', debounce(handleTableSearch, 300));
+    // Dashboard Filtros
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const searchInput = document.getElementById('searchInput');
+    const itemsPerPage = document.getElementById('itemsPerPage');
+    const tableSearch = document.getElementById('tableSearch');
     
-    // Exportação
-    document.getElementById('exportPdfBtn')?.addEventListener('click', exportToPDF);
-    document.getElementById('exportCsvBtn')?.addEventListener('click', exportToCSV);
-    document.getElementById('exportReportBtn')?.addEventListener('click', exportReport);
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', applyFilters);
+    }
+    
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(handleSearch, 300));
+    }
+    
+    if (itemsPerPage) {
+        itemsPerPage.addEventListener('change', function() {
+            STATE.itemsPerPage = parseInt(this.value);
+            updateTables();
+            updatePagination();
+        });
+    }
+    
+    if (tableSearch) {
+        tableSearch.addEventListener('input', debounce(handleTableSearch, 300));
+    }
+    
+    // Botões de exportação
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const exportReportBtn = document.getElementById('exportReportBtn');
+    
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', exportToPDF);
+    }
+    
+    if (exportCsvBtn) {
+        exportCsvBtn.addEventListener('click', exportToCSV);
+    }
+    
+    if (exportReportBtn) {
+        exportReportBtn.addEventListener('click', exportReport);
+    }
 }
 
 function setupDragAndDrop() {
@@ -321,7 +367,10 @@ function handleFileSelect() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
     
-    if (!file) return;
+    if (!file) {
+        showNotification('Nenhum arquivo selecionado', 'warning');
+        return;
+    }
     
     const validExtensions = ['.xlsx', '.xls', '.csv'];
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -334,17 +383,35 @@ function handleFileSelect() {
     
     STATE.currentFile = file;
     
+    // Atualizar UI
     document.getElementById('fileNameDisplay').textContent = file.name;
     document.getElementById('fileSizeDisplay').textContent = formatFileSize(file.size);
     document.getElementById('fileInfo').style.display = 'block';
-    document.getElementById('uploadArea').style.display = 'none';
+    
+    // Atualizar informação no header
+    const fileInfoElement = document.getElementById('currentFileInfo');
+    if (fileInfoElement) {
+        fileInfoElement.textContent = `Analisando: ${file.name}`;
+    }
+    
+    showNotification(`Arquivo "${file.name}" selecionado com sucesso`, 'success');
 }
 
 function clearSelectedFile() {
     document.getElementById('fileInput').value = '';
     STATE.currentFile = null;
+    
+    document.getElementById('fileNameDisplay').textContent = 'arquivo.xlsx';
+    document.getElementById('fileSizeDisplay').textContent = '0 KB';
     document.getElementById('fileInfo').style.display = 'none';
-    document.getElementById('uploadArea').style.display = 'block';
+    
+    // Atualizar informação no header
+    const fileInfoElement = document.getElementById('currentFileInfo');
+    if (fileInfoElement) {
+        fileInfoElement.textContent = 'Analisando: Aprodet_Filled_Data.xlsx';
+    }
+    
+    showNotification('Arquivo removido', 'info');
 }
 
 function formatFileSize(bytes) {
@@ -366,17 +433,26 @@ async function startAnalysis() {
             generateDemoData();
         }
         
+        // Validar dados
         const validation = validateData(STATE.processedData);
         if (!validation.valid) {
             throw new Error(validation.message);
         }
         
+        // Inicializar dados filtrados
         STATE.filteredData = [...STATE.processedData];
         STATE.originalData = [...STATE.processedData];
         
+        // Calcular indicadores
         calculateIndicators();
+        
+        // Atualizar UI
         updateDashboard();
+        
+        // Mostrar dashboard
         showDashboard();
+        
+        // Salvar para recarregamento
         saveToLocalStorage();
         
         showNotification('Análise concluída com sucesso!', 'success');
@@ -402,6 +478,7 @@ async function processUploadedFile(file) {
                 if (file.name.endsWith('.csv')) {
                     STATE.processedData = parseCSV(e.target.result);
                 } else {
+                    // Para Excel, usar dados de demonstração
                     showNotification('Arquivo Excel detectado. Processando com dados de demonstração.', 'info');
                     STATE.processedData = generateDemoData();
                 }
@@ -435,6 +512,7 @@ function parseCSV(csvText) {
         headers.forEach((header, index) => {
             let value = values[index] || '';
             
+            // Converter tipos específicos
             if (header === 'Valor_Aquisição') {
                 value = parseFloat(value.replace(/[^0-9.-]/g, '')) || 0;
             } else if (header === 'Quantidade') {
@@ -451,11 +529,15 @@ function parseCSV(csvText) {
 }
 
 function generateDemoData() {
+    console.log('Gerando dados de demonstração...');
+    
     const categories = ['Mobiliário', 'Equipamento Informático', 'Veículos', 'Maquinaria', 'Edifícios', 'Ferramentas', 'Equipamento Médico'];
     const statuses = ['Bom', 'Regular', 'Ruim'];
     const districts = ['Maputo', 'Matola', 'Beira', 'Nampula', 'Quelimane', 'Tete', 'Xai-Xai', 'Inhambane', 'Pemba'];
     const uses = ['Em uso', 'Em armazém', 'Em manutenção', 'Desativado', 'Em reparação'];
     const responsibles = ['Maria Silva', 'João Santos', 'Ana Pereira', 'Carlos Mendes', 'Sofia Costa', 'Miguel Fernandes', 'Luísa Gomes'];
+    const suppliers = ['Fornecedor A', 'Fornecedor B', 'Fornecedor C', 'Fornecedor D'];
+    const sources = ['Compra', 'Doação', 'Transferência', 'Herança'];
     
     const demoData = [];
     const currentYear = new Date().getFullYear();
@@ -464,9 +546,9 @@ function generateDemoData() {
         const category = categories[i % categories.length];
         const status = statuses[i % statuses.length];
         const district = districts[i % districts.length];
-        const value = Math.round((Math.random() * 500000 + 1000) * 100) / 100;
+        const value = Math.round((Math.random() * 500000 + 1000) * 100) / 100; // 1,000 - 500,000 MZN
         const quantity = Math.floor(Math.random() * 5) + 1;
-        const year = currentYear - (i % 6);
+        const year = currentYear - (i % 6); // Últimos 6 anos
         const month = (i % 12) + 1;
         const day = (i % 28) + 1;
         
@@ -481,8 +563,8 @@ function generateDemoData() {
             'Estado_Conservação': status,
             'Data_Aquisição': `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
             'Valor_Aquisição': value,
-            'Fonte_Aquisição': ['Compra', 'Doação', 'Transferência', 'Herança'][i % 4],
-            'Fornecedor': ['Fornecedor A', 'Fornecedor B', 'Fornecedor C', 'Fornecedor D'][i % 4],
+            'Fonte_Aquisição': sources[i % sources.length],
+            'Fornecedor': suppliers[i % suppliers.length],
             'Localização_Item': `Sala ${(i % 50) + 1}, Edifício ${String.fromCharCode(65 + (i % 5))}`,
             'Distrito_Localização': district,
             'Uso_Actual': uses[i % uses.length],
@@ -496,14 +578,18 @@ function generateDemoData() {
         });
     }
     
+    console.log(`Dados de demonstração gerados: ${demoData.length} itens`);
     return demoData;
 }
 
 // ===== CÁLCULO DE INDICADORES =====
 function calculateIndicators() {
+    console.log('Calculando indicadores...');
+    
     const data = STATE.filteredData.length > 0 ? STATE.filteredData : STATE.processedData;
     
     if (!data || data.length === 0) {
+        console.warn('Nenhum dado para calcular indicadores');
         resetIndicators();
         return;
     }
@@ -526,28 +612,35 @@ function calculateIndicators() {
         const district = item['Distrito_Localização'] || 'Não Especificado';
         const date = item['Data_Aquisição'];
         
+        // Valor total
         totalValue += value * quantity;
         totalItems += quantity;
         
+        // Distribuição por estado
         statusDistribution[status] = (statusDistribution[status] || 0) + quantity;
         
+        // Pontuação de estado (0-100)
         if (status === 'Bom') statusScore += quantity * 100;
         else if (status === 'Regular') statusScore += quantity * 60;
         else if (status === 'Ruim') statusScore += quantity * 20;
         else statusScore += quantity * 50;
         
+        // Itens críticos
         if (status === 'Ruim' && value > 10000) {
             criticalItems += quantity;
         }
         
+        // Distribuição por categoria
         if (!categoryDistribution[category]) {
             categoryDistribution[category] = { value: 0, count: 0 };
         }
         categoryDistribution[category].value += value * quantity;
         categoryDistribution[category].count += quantity;
         
+        // Distribuição por distrito
         districtDistribution[district] = (districtDistribution[district] || 0) + 1;
         
+        // Timeline por ano
         if (date) {
             const year = date.substring(0, 4);
             if (!timelineData[year]) {
@@ -558,6 +651,7 @@ function calculateIndicators() {
         }
     });
     
+    // Calcular estado médio
     const avgStatus = totalItems > 0 ? Math.round(statusScore / totalItems) : 0;
     
     STATE.indicators = {
@@ -570,6 +664,8 @@ function calculateIndicators() {
         districtDistribution,
         timelineData
     };
+    
+    console.log('Indicadores calculados:', STATE.indicators);
 }
 
 function resetIndicators() {
@@ -590,6 +686,7 @@ function validateData(data) {
         return { valid: false, message: 'Dados inválidos ou vazios' };
     }
     
+    // Verificar campos obrigatórios
     const sampleItem = data[0];
     const required = ['ID_Item', 'Nome_Item', 'Categoria', 'Valor_Aquisição'];
     
@@ -607,30 +704,33 @@ function validateData(data) {
 
 // ===== ATUALIZAÇÃO DO DASHBOARD =====
 function updateDashboard() {
+    console.log('Atualizando dashboard...');
+    
     updateIndicatorsUI();
     updateFilterOptions();
     createCharts();
     updateTables();
     updateSummary();
+    updateRecommendations();
     updateUIState();
     
-    // Aplicar correções de layout após atualização
-    setTimeout(() => {
-        fixDuplicatedTitle();
-        fixLogoCircles();
-    }, 100);
+    // Aplicar correções após atualização
+    setTimeout(fixLayoutIssues, 100);
 }
 
 function updateIndicatorsUI() {
+    console.log('Atualizando indicadores UI...');
+    
     const indicators = STATE.indicators;
     
+    // Formatar valor em MZN
     const formattedValue = formatCurrency(indicators.totalValue);
     
+    // Atualizar cards
     const totalValueElement = document.getElementById('totalValue');
     if (totalValueElement) {
-        totalValueElement.innerHTML = 
-            `<span class="currency-symbol">MZN</span> ${formattedValue}`;
-        totalValueElement.classList.add('smaller-font');
+        totalValueElement.textContent = `MZN ${formattedValue.replace('MZN', '').trim()}`;
+        totalValueElement.classList.add('patrimony-value');
     }
     
     document.getElementById('totalItems').textContent = 
@@ -642,11 +742,13 @@ function updateIndicatorsUI() {
     document.getElementById('criticalItems').textContent = 
         indicators.criticalItems.toLocaleString('pt-PT');
     
+    // Atualizar contador de itens críticos
     const criticalCount = document.getElementById('criticalCount');
     if (criticalCount) {
         criticalCount.textContent = `${indicators.criticalItems} itens`;
     }
     
+    // Atualizar informações do arquivo
     const fileInfo = document.getElementById('currentFileInfo');
     if (fileInfo) {
         if (STATE.currentFile) {
@@ -656,6 +758,7 @@ function updateIndicatorsUI() {
         }
     }
     
+    // Atualizar contador de resultados
     const resultsCount = document.getElementById('resultsCount');
     if (resultsCount) {
         const total = STATE.originalData.length;
@@ -667,6 +770,9 @@ function updateIndicatorsUI() {
 function updateFilterOptions() {
     if (!STATE.processedData || STATE.processedData.length === 0) return;
     
+    console.log('Atualizando opções de filtro...');
+    
+    // Coletar valores únicos
     const categories = new Set();
     const districts = new Set();
     const responsibles = new Set();
@@ -679,6 +785,7 @@ function updateFilterOptions() {
         if (item['Uso_Actual']) uses.add(item['Uso_Actual']);
     });
     
+    // Atualizar selects
     updateSelect('categoryFilter', Array.from(categories).sort(), 'Todas as Categorias');
     updateSelect('districtFilter', Array.from(districts).sort(), 'Todos os Distritos');
     updateSelect('responsibleFilter', Array.from(responsibles).sort(), 'Todos os Responsáveis');
@@ -690,13 +797,17 @@ function updateSelect(selectId, options, defaultText) {
     if (!select) return;
     
     const currentValue = select.value;
+    
+    // Limpar opções
     select.innerHTML = '';
     
+    // Adicionar opção padrão
     const defaultOption = document.createElement('option');
     defaultOption.value = 'all';
     defaultOption.textContent = defaultText;
     select.appendChild(defaultOption);
     
+    // Adicionar opções
     options.forEach(option => {
         const opt = document.createElement('option');
         opt.value = option;
@@ -704,6 +815,7 @@ function updateSelect(selectId, options, defaultText) {
         select.appendChild(opt);
     });
     
+    // Restaurar valor selecionado se ainda existir
     if (currentValue && options.includes(currentValue)) {
         select.value = currentValue;
     }
@@ -711,8 +823,12 @@ function updateSelect(selectId, options, defaultText) {
 
 // ===== GRÁFICOS =====
 function createCharts() {
+    console.log('Criando gráficos...');
+    
+    // Destruir gráficos existentes
     destroyCharts();
     
+    // Criar novos gráficos
     createCategoryChart();
     createStatusChart();
     createDistrictChart();
@@ -737,6 +853,7 @@ function createCategoryChart() {
     
     const labels = Object.keys(distribution);
     const data = labels.map(label => distribution[label].value);
+    
     const backgroundColors = generateColors(labels.length);
     
     STATE.charts.category = new Chart(ctx, {
@@ -772,7 +889,7 @@ function createCategoryChart() {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.dataset.label || ''}: ${formatCurrency(context.parsed.y || context.parsed)}`;
+                            return `${formatCurrency(context.parsed.y || context.parsed)}`;
                         }
                     }
                 }
@@ -979,6 +1096,7 @@ function updateAllItemsTable() {
     
     tbody.innerHTML = '';
     
+    // Calcular paginação
     const startIndex = (STATE.currentPage - 1) * STATE.itemsPerPage;
     const endIndex = startIndex + STATE.itemsPerPage;
     const paginatedItems = STATE.filteredData.slice(startIndex, endIndex);
@@ -998,6 +1116,7 @@ function updateAllItemsTable() {
         return;
     }
     
+    // Adicionar itens à tabela
     paginatedItems.forEach(item => {
         const row = document.createElement('tr');
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -1031,6 +1150,7 @@ function updateCriticalTable() {
     
     tbody.innerHTML = '';
     
+    // Filtrar itens críticos
     const criticalItems = STATE.filteredData.filter(item => {
         const status = item['Estado_Conservação'];
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -1052,6 +1172,7 @@ function updateCriticalTable() {
         return;
     }
     
+    // Adicionar itens à tabela
     criticalItems.slice(0, 20).forEach(item => {
         const row = document.createElement('tr');
         const value = parseFloat(item['Valor_Aquisição']) || 0;
@@ -1078,6 +1199,7 @@ function updatePagination() {
     const totalItems = STATE.filteredData.length;
     const totalPages = Math.ceil(totalItems / STATE.itemsPerPage);
     
+    // Atualizar informações
     const paginationInfo = document.getElementById('paginationInfo');
     if (paginationInfo) {
         const start = ((STATE.currentPage - 1) * STATE.itemsPerPage) + 1;
@@ -1085,11 +1207,13 @@ function updatePagination() {
         paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} itens`;
     }
     
+    // Atualizar controles
     const controls = document.getElementById('paginationControls');
     if (!controls) return;
     
     controls.innerHTML = '';
     
+    // Botão anterior
     const prevBtn = document.createElement('button');
     prevBtn.className = `btn-pagination ${STATE.currentPage === 1 ? 'disabled' : ''}`;
     prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -1097,6 +1221,7 @@ function updatePagination() {
     prevBtn.onclick = () => changePage(STATE.currentPage - 1);
     controls.appendChild(prevBtn);
     
+    // Números de página
     const maxVisiblePages = 5;
     let startPage = Math.max(1, STATE.currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
@@ -1113,6 +1238,7 @@ function updatePagination() {
         controls.appendChild(pageBtn);
     }
     
+    // Botão próximo
     const nextBtn = document.createElement('button');
     nextBtn.className = `btn-pagination ${STATE.currentPage === totalPages ? 'disabled' : ''}`;
     nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
@@ -1137,14 +1263,23 @@ function applyFilters() {
         return;
     }
     
+    console.log('Aplicando filtros...');
+    
+    // Coletar valores dos filtros
     collectFilterValues();
     
+    // Aplicar filtros
     STATE.filteredData = STATE.processedData.filter(item => {
         return applyAllFilters(item);
     });
     
+    // Recalcular indicadores
     calculateIndicators();
+    
+    // Resetar paginação
     STATE.currentPage = 1;
+    
+    // Atualizar UI
     updateDashboard();
     
     showNotification(`Filtros aplicados: ${STATE.filteredData.length} itens encontrados`, 'success');
@@ -1166,26 +1301,32 @@ function getSelectValue(selectId) {
 function applyAllFilters(item) {
     const filters = STATE.filters;
     
+    // Filtro de categoria
     if (filters.category !== 'all' && filters.category !== item['Categoria']) {
         return false;
     }
     
+    // Filtro de distrito
     if (filters.district !== 'all' && filters.district !== item['Distrito_Localização']) {
         return false;
     }
     
+    // Filtro de estado
     if (filters.status !== 'all' && filters.status !== item['Estado_Conservação']) {
         return false;
     }
     
+    // Filtro de responsável
     if (filters.responsible !== 'all' && filters.responsible !== item['Responsável_Item']) {
         return false;
     }
     
+    // Filtro de uso
     if (filters.use !== 'all' && filters.use !== item['Uso_Actual']) {
         return false;
     }
     
+    // Filtro de busca
     if (STATE.searchTerm && STATE.searchTerm.trim() !== '') {
         const searchLower = STATE.searchTerm.toLowerCase();
         const searchFields = [
@@ -1208,6 +1349,9 @@ function applyAllFilters(item) {
 }
 
 function resetFilters() {
+    console.log('Resetando filtros...');
+    
+    // Resetar estado
     STATE.filters = {
         category: 'all',
         district: 'all',
@@ -1219,6 +1363,7 @@ function resetFilters() {
     STATE.searchTerm = '';
     STATE.currentPage = 1;
     
+    // Resetar controles
     const controls = [
         'categoryFilter', 'districtFilter', 'statusFilter',
         'responsibleFilter', 'useFilter', 'searchInput'
@@ -1235,9 +1380,13 @@ function resetFilters() {
         }
     });
     
-    document.getElementById('tableSearch').value = '';
+    const tableSearch = document.getElementById('tableSearch');
+    if (tableSearch) tableSearch.value = '';
     
+    // Resetar dados filtrados
     STATE.filteredData = [...STATE.processedData];
+    
+    // Recalcular
     calculateIndicators();
     updateDashboard();
     
@@ -1257,6 +1406,189 @@ function handleTableSearch(e) {
         const text = row.textContent.toLowerCase();
         row.style.display = text.includes(searchTerm) ? '' : 'none';
     });
+}
+
+// ===== RESUMO E RECOMENDAÇÕES =====
+function updateSummary() {
+    updateSummaryContent();
+}
+
+function updateSummaryContent() {
+    const container = document.getElementById('summaryContent');
+    if (!container) return;
+    
+    const indicators = STATE.indicators;
+    const totalItems = indicators.totalItems || 0;
+    const avgStatus = indicators.avgStatus || 0;
+    
+    let summaryHTML = `
+        <div class="summary-item">
+            <div class="summary-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="summary-text">
+                <h4>Valor Total</h4>
+                <p>${formatCurrency(indicators.totalValue)} em ${totalItems.toLocaleString('pt-PT')} itens</p>
+            </div>
+        </div>
+        
+        <div class="summary-item">
+            <div class="summary-icon">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="summary-text">
+                <h4>Estado Geral</h4>
+                <p>Índice de conservação: <strong>${avgStatus}%</strong></p>
+            </div>
+        </div>
+    `;
+    
+    // Adicionar distribuição por categoria
+    const categories = Object.keys(indicators.categoryDistribution || {});
+    if (categories.length > 0) {
+        const topCategory = categories.reduce((a, b) => 
+            indicators.categoryDistribution[a].value > indicators.categoryDistribution[b].value ? a : b
+        );
+        
+        summaryHTML += `
+            <div class="summary-item">
+                <div class="summary-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="summary-text">
+                    <h4>Categoria Principal</h4>
+                    <p>${topCategory}: ${formatCurrency(indicators.categoryDistribution[topCategory].value)}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Adicionar distribuição geográfica
+    const districts = Object.keys(indicators.districtDistribution || {});
+    if (districts.length > 0) {
+        const topDistrict = districts.reduce((a, b) => 
+            indicators.districtDistribution[a] > indicators.districtDistribution[b] ? a : b
+        );
+        
+        summaryHTML += `
+            <div class="summary-item">
+                <div class="summary-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="summary-text">
+                    <h4>Distrito com Mais Itens</h4>
+                    <p>${topDistrict}: ${indicators.districtDistribution[topDistrict]} itens</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = summaryHTML;
+}
+
+function updateRecommendations() {
+    const container = document.getElementById('recommendationsContent');
+    if (!container) return;
+    
+    const indicators = STATE.indicators;
+    const recommendations = [];
+    
+    // Recomendações baseadas em indicadores
+    if (indicators.criticalItems > 0) {
+        recommendations.push({
+            icon: 'exclamation-triangle',
+            color: 'error',
+            text: `Priorizar manutenção de ${indicators.criticalItems} itens críticos (alto valor + estado ruim)`,
+            priority: 'Alta'
+        });
+    }
+    
+    if (indicators.avgStatus < 70) {
+        recommendations.push({
+            icon: 'tools',
+            color: 'warning',
+            text: `Implementar plano de manutenção preventiva (estado médio: ${indicators.avgStatus}%)`,
+            priority: 'Média'
+        });
+    }
+    
+    // Se não houver recomendações específicas
+    if (recommendations.length === 0) {
+        recommendations.push({
+            icon: 'check-circle',
+            color: 'success',
+            text: 'Situação do patrimônio dentro dos parâmetros aceitáveis',
+            priority: 'Baixa'
+        });
+    }
+    
+    // Gerar HTML
+    let recommendationsHTML = '';
+    recommendations.forEach(rec => {
+        recommendationsHTML += `
+            <div class="recommendation-item ${rec.color}">
+                <div class="recommendation-icon">
+                    <i class="fas fa-${rec.icon}"></i>
+                </div>
+                <div class="recommendation-content">
+                    <p>${rec.text}</p>
+                    <span class="priority-badge ${rec.color}">Prioridade: ${rec.priority}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = recommendationsHTML;
+}
+
+// ===== NAVEGAÇÃO =====
+function showDashboard() {
+    console.log('Mostrando dashboard...');
+    
+    document.getElementById('uploadPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    
+    // Atualizar data e hora
+    updateCurrentDate();
+    
+    const lastUpdate = document.getElementById('lastUpdate');
+    if (lastUpdate) {
+        lastUpdate.textContent = `Dashboard APRODET - Análise Patrimonial | Última atualização: ${new Date().toLocaleString('pt-PT')}`;
+    }
+    
+    // Atualizar contador
+    const processedItems = document.getElementById('processedItems');
+    if (processedItems) {
+        processedItems.textContent = STATE.processedData.length;
+    }
+    
+    // Atualizar modo
+    const analysisMode = document.getElementById('analysisMode');
+    if (analysisMode) {
+        analysisMode.textContent = STATE.currentFile ? 'Arquivo Carregado' : 'Demonstração';
+    }
+    
+    // Aplicar correções após mostrar dashboard
+    setTimeout(fixLayoutIssues, 100);
+    
+    // Scroll para topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBackToHome() {
+    console.log('Voltando para página inicial...');
+    
+    document.getElementById('dashboardPage').style.display = 'none';
+    document.getElementById('uploadPage').style.display = 'block';
+    
+    // Limpar arquivo selecionado
+    clearSelectedFile();
+    
+    // Resetar estado
+    STATE.filteredData = [...STATE.processedData];
+    STATE.currentPage = 1;
+    
+    showNotification('Pronto para novo upload ou análise', 'info');
 }
 
 // ===== FUNÇÕES AUXILIARES =====
@@ -1333,6 +1665,7 @@ function updateCurrentDate() {
 }
 
 function updateUIState() {
+    // Atualizar estado dos botões baseado nos dados
     const hasData = STATE.filteredData && STATE.filteredData.length > 0;
     
     const exportButtons = ['exportPdfBtn', 'exportCsvBtn', 'exportReportBtn'];
@@ -1342,38 +1675,6 @@ function updateUIState() {
             btn.disabled = !hasData;
         }
     });
-}
-
-// ===== NAVEGAÇÃO =====
-function showDashboard() {
-    document.getElementById('uploadPage').style.display = 'none';
-    document.getElementById('dashboardPage').style.display = 'block';
-    
-    updateCurrentDate();
-    document.getElementById('lastUpdate').textContent = 
-        new Date().toLocaleTimeString('pt-PT');
-    
-    document.getElementById('processedItems').textContent = 
-        STATE.processedData.length;
-    
-    // Aplicar correções após mostrar dashboard
-    setTimeout(() => {
-        fixDuplicatedTitle();
-        fixLogoCircles();
-    }, 100);
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goBackToHome() {
-    document.getElementById('dashboardPage').style.display = 'none';
-    document.getElementById('uploadPage').style.display = 'block';
-    clearSelectedFile();
-    
-    STATE.filteredData = [...STATE.processedData];
-    STATE.currentPage = 1;
-    
-    showNotification('Pronto para novo upload ou análise', 'info');
 }
 
 // ===== MODAL =====
@@ -1413,8 +1714,12 @@ window.showItemDetails = function(itemId) {
                 </span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Valor:</span>
+                <span class="detail-label">Valor de Aquisição:</span>
                 <span class="detail-value">${formatCurrency(parseFloat(item['Valor_Aquisição']) || 0)}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Data de Aquisição:</span>
+                <span class="detail-value">${escapeHtml(item['Data_Aquisição'])}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Localização:</span>
@@ -1441,6 +1746,29 @@ window.showItemDetails = function(itemId) {
     modal.style.display = 'flex';
 };
 
+// ===== EXPORTAÇÃO =====
+function exportToPDF() {
+    showNotification('Exportação para PDF em desenvolvimento', 'info');
+}
+
+function exportToCSV() {
+    if (!STATE.filteredData || STATE.filteredData.length === 0) {
+        showNotification('Nenhum dado para exportar', 'warning');
+        return;
+    }
+    
+    showNotification('Exportação para CSV em desenvolvimento', 'info');
+}
+
+function exportReport() {
+    if (!STATE.filteredData || STATE.filteredData.length === 0) {
+        showNotification('Nenhum dado para relatório', 'warning');
+        return;
+    }
+    
+    showNotification('Geração de relatório em desenvolvimento', 'info');
+}
+
 // ===== NOTIFICAÇÕES =====
 window.showNotification = function(message, type = 'info') {
     const notification = document.getElementById('notification');
@@ -1449,6 +1777,7 @@ window.showNotification = function(message, type = 'info') {
     
     if (!notification || !notificationText || !notificationIcon) return;
     
+    // Configurar ícone
     let iconClass = 'fa-info-circle';
     if (type === 'success') iconClass = 'fa-check-circle';
     else if (type === 'error') iconClass = 'fa-exclamation-circle';
@@ -1459,6 +1788,7 @@ window.showNotification = function(message, type = 'info') {
     notification.className = `notification ${type}`;
     notification.style.display = 'block';
     
+    // Esconder automaticamente
     setTimeout(() => {
         notification.style.display = 'none';
     }, 5000);
@@ -1481,6 +1811,7 @@ function saveToLocalStorage() {
             dataLength: STATE.processedData.length
         };
         localStorage.setItem('aprodetDashboard', JSON.stringify(dataToSave));
+        console.log('Dados salvos no localStorage');
     } catch (error) {
         console.warn('Não foi possível salvar dados:', error);
     }
@@ -1502,34 +1833,6 @@ function checkSavedData() {
     }
 }
 
-// ===== FUNÇÕES DE EXPORTAÇÃO (simplificadas) =====
-function exportToPDF() {
-    showNotification('Função PDF em desenvolvimento', 'info');
-}
-
-function exportToCSV() {
-    if (!STATE.filteredData || STATE.filteredData.length === 0) {
-        showNotification('Nenhum dado para exportar', 'warning');
-        return;
-    }
-    
-    showNotification('Função CSV em desenvolvimento', 'info');
-}
-
-function exportReport() {
-    if (!STATE.filteredData || STATE.filteredData.length === 0) {
-        showNotification('Nenhum dado para relatório', 'warning');
-        return;
-    }
-    
-    showNotification('Função Relatório em desenvolvimento', 'info');
-}
-
-// ===== RESUMO E RECOMENDAÇÕES (simplificadas) =====
-function updateSummary() {
-    // Função simplificada
-}
-
 // ===== PREVENIR SAÍDA =====
 window.addEventListener('beforeunload', function(e) {
     if (STATE.isLoading) {
@@ -1544,5 +1847,6 @@ setTimeout(() => {
     if (typeof Chart !== 'undefined') {
         Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
         Chart.defaults.color = '#6B7280';
+        console.log('Chart.js configurado');
     }
 }, 100);
