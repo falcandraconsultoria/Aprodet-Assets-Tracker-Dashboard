@@ -377,4 +377,8 @@ body {
 
 /* Cabeçalho */
 .header {
-    background: linear-gradient(135deg, var(--aprodet-dark),
+    background: linear-gradient(135deg, var(--aprodet-dark), var(--aprodet-medium));
+    color: var(--white);
+    padding: 1.5rem;
+    text-align: center;
+}
