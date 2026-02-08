@@ -1,1 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APRODET - Dashboard Patrimonial</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* Estilos adicionais específicos */
+        .notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success { background: #10B981; }
+        .notification.error { background: #EF4444; }
+        .notification.warning { background: #F97316; }
+        .notification.info { background: #3B82F6; }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .required-fields {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .required-fields h4 {
+            color: #92400E;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        
+        .field-tag {
+            background: white;
+            border: 1px solid #F59E0B;
+            color: #92400E;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        .currency-symbol {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .demo-warning {
+            background: #DBEAFE;
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #1E40AF;
+        }
+        
+        .demo-warning i {
+            color: #3B82F6;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notificação -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i id="notification-icon" class="fas fa-info-circle"></i>
+            <span id="notification-text">Mensagem de notificação</span>
+            <button class="notification-close" onclick="hideNotification()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Página de Upload -->
+    <div id="uploadPage">
+        <div class="welcome-container">
+            <div class="welcome-logo">
+                <div class="logo-circle">
+                    <span>APD</span>
+                </div>
+                <h1>APRODET Dashboard</h1>
+                <p class="subtitle">Sistema de Gestão e Análise Patrimonial</p>
+            </div>
+            
+            <div class="welcome-content">
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3>Upload Simples</h3>
+                        <p>Carregue ficheiros Excel ou CSV com os dados do patrimônio</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>Análise Visual</h3>
+                        <p>Gráficos interativos e indicadores em tempo real</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <h3>Filtros Avançados</h3>
+                        <p>Filtre por categoria, distrito, estado e valor</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <h3>Exportação</h3>
+                        <p>Exporte relatórios em PDF, CSV e texto</p>
+                    </div>
+                </div>
+                
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>Carregar Ficheiro</h3>
+                        <p>Arraste ou clique para selecionar arquivo Excel/CSV</p>
+                        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+                        <button class="btn btn-primary" id="selectFileBtn">
+                            <i class="fas fa-folder-open"></i> Selecionar Arquivo
+                        </button>
+                        <p class="file-requirements">Formatos suportados: .xlsx, .xls, .csv</p>
+                        
+                        <div class="demo-warning">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Modo de demonstração:</strong> Se não tiver arquivo, o sistema usará dados de exemplo
+                        </div>
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-details">
+                            <i class="fas fa-file-excel file-icon"></i>
+                            <div class="file-text">
+                                <h4 id="fileNameDisplay">Nome do arquivo</h4>
+                                <p id="fileSizeDisplay">Tamanho do arquivo</p>
+                            </div>
+                            <button class="btn-clear" id="clearFileBtn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-start" id="startAnalysisBtn">
+                            <i class="fas fa-rocket"></i> Iniciar Análise
+                        </button>
+                    </div>
+                    
+                    <div class="required-fields">
+                        <h4><i class="fas fa-list-check"></i> Campos Obrigatórios no Arquivo</h4>
+                        <div class="fields-grid" id="requiredFieldsGrid">
+                            <!-- Campos serão preenchidos via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-footer">
+                <p>
+                    <i class="fas fa-shield-alt"></i> 
+                    <strong>Processamento 100% local:</strong> Seus dados não saem do seu computador
+                </p>
+                <p class="version">APRODET Dashboard v1.0 | Moeda: Metical (MZN)</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div id="dashboardPage" style="display: none;">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-section">
+                        <div class="logo-placeholder">
+                            APD
+                        </div>
+                        <div class="title">
+                            <h1>APRODET Dashboard</h1>
+                            <p id="dashboardSubtitle">Análise Patrimonial</p>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="date-display" id="currentDate">
+                            <!-- Data atual será inserida via JavaScript -->
+                        </div>
+                        <button class="btn btn-header" id="backToHomeBtn">
+                            <i class="fas fa-home"></i> Novo Upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="container">
+            <!-- Barra de Ações -->
+            <div class="action-bar">
+                <div class="file-info-display">
+                    <i class="fas fa-file-alt"></i>
+                    <span id="currentFileInfo">Modo de demonstração</span>
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-export" id="exportPdfBtn">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button class="btn btn-export" id="exportCsvBtn">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </button>
+                    <button class="btn btn-export" id="exportReportBtn">
+                        <i class="fas fa-file-alt"></i> Relatório
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="filters-section">
+                <h3><i class="fas fa-filter"></i> Filtros Avançados</h3>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="categoryFilter"><i class="fas fa-tags"></i> Categoria</label>
+                        <select id="categoryFilter">
+                            <option value="all">Todas as Categorias</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="districtFilter"><i class="fas fa-map-marker-alt"></i> Distrito</label>
+                        <select id="districtFilter">
+                            <option value="all">Todos os Distritos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="statusFilter"><i class="fas fa-clipboard-check"></i> Estado</label>
+                        <select id="statusFilter">
+                            <option value="all">Todos os Estados</option>
+                            <option value="Bom">Bom</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Ruim">Ruim</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="responsibleFilter"><i class="fas fa-user"></i> Responsável</label>
+                        <select id="responsibleFilter">
+                            <option value="all">Todos os Responsáveis</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="valueRange"><i class="fas fa-coins"></i> Valor (MZN)</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minValue" placeholder="Mínimo" min="0">
+                            <span>até</span>
+                            <input type="number" id="maxValue" placeholder="Máximo" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="searchInput"><i class="fas fa-search"></i> Buscar</label>
+                        <input type="text" id="searchInput" placeholder="Pesquisar itens...">
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="applyFiltersBtn">
+                        <i class="fas fa-check"></i> Aplicar Filtros
+                    </button>
+                    <button class="btn btn-secondary" id="resetFiltersBtn">
+                        <i class="fas fa-redo"></i> Limpar Filtros
+                    </button>
+                    <div class="results-count" id="resultsCount">
+                        <!-- Contador de resultados será inserido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cards de Indicadores -->
+            <div class="indicators">
+                <div class="card card-1">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Valor Total do Patrimônio</div>
+                            <div class="card-value" id="totalValue">
+                                <span class="currency-symbol">MZN</span> 0,00
+                            </div>
+                            <div class="card-change">Soma de todos os valores</div>
+                        </div>
+                        <div class="card-icon icon-1">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card card-2">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Total de Itens</div>
+                            <div class="card-value" id="totalItems">0</div>
+                            <div class="card-change">Itens no inventário</div>
+                        </div>
+                        <div class="card-icon icon-2">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card card-3">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Estado Médio</div>
+                            <div class="card-value" id="avgStatus">0%</div>
+                            <div class="card-change">Índice de conservação</div>
+                        </div>
+                        <div class="card-icon icon-3">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card card-4">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Itens Críticos</div>
+                            <div class="card-value" id="criticalItems">0</div>
+                            <div class="card-change">Requerem atenção imediata</div>
+                        </div>
+                        <div class="card-icon icon-4">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráficos -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-pie"></i> Valor por Categoria (MZN)</h3>
+                        <div class="chart-actions">
+                            <button class="chart-action-btn" onclick="toggleChartType('category')">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> Estado de Conservação</h3>
+                        <div class="chart-actions">
+                            <button class="chart-action-btn" onclick="toggleChartType('status')">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-line"></i> Aquisições ao Longo do Tempo</h3>
+                        <div class="chart-actions">
+                            <button class="chart-action-btn" onclick="toggleChartType('timeline')">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-map-marked-alt"></i> Distribuição por Distrito</h3>
+                        <div class="chart-actions">
+                            <button class="chart-action-btn" onclick="toggleChartType('district')">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="districtChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabelas -->
+            <div class="tables-section">
+                <div class="table-container-wrapper">
+                    <div class="table-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Itens Críticos</h3>
+                        <span class="badge critical" id="criticalCount">0 itens</span>
+                    </div>
+                    <div class="table-container">
+                        <table id="criticalTable">
+                            <thead>
+                                <tr>
+                                    <th>ID Item</th>
+                                    <th>Nome do Item</th>
+                                    <th>Categoria</th>
+                                    <th>Estado</th>
+                                    <th>Valor (MZN)</th>
+                                    <th>Localização</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="criticalTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="table-container-wrapper">
+                    <div class="table-header">
+                        <h3><i class="fas fa-list-ol"></i> Todos os Itens</h3>
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="tableSearch" placeholder="Pesquisar na tabela...">
+                            </div>
+                            <select id="itemsPerPage">
+                                <option value="10">10 itens por página</option>
+                                <option value="25">25 itens por página</option>
+                                <option value="50">50 itens por página</option>
+                                <option value="100">100 itens por página</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="allItemsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Estado</th>
+                                    <th>Valor (MZN)</th>
+                                    <th>Distrito</th>
+                                    <th>Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allItemsTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer">
+                        <div class="pagination-info" id="paginationInfo">
+                            Mostrando 0 de 0 itens
+                        </div>
+                        <div class="pagination-controls" id="paginationControls">
+                            <!-- Controles de paginação serão inseridos via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resumo e Recomendações -->
+            <div class="summary-section">
+                <div class="summary-card">
+                    <h3><i class="fas fa-chart-line"></i> Resumo da Análise</h3>
+                    <div class="summary-content" id="summaryContent">
+                        <!-- Resumo será gerado via JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="recommendations-card">
+                    <h3><i class="fas fa-lightbulb"></i> Recomendações</h3>
+                    <div class="recommendations-content" id="recommendationsContent">
+                        <!-- Recomendações serão geradas via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rodapé -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-info">
+                        <p><i class="fas fa-database"></i> <strong id="processedItems">0</strong> itens processados</p>
+                        <p><i class="fas fa-clock"></i> Última atualização: <span id="lastUpdate">-</span></p>
+                    </div>
+                    <div class="footer-brand">
+                        <p><strong>APRODET Dashboard v1.0</strong> | Sistema de análise patrimonial</p>
+                        <p>Moeda: Metical (MZN) | Processamento 100% local</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loadingText">Processando dados...</p>
+            <div class="loading-progress" id="loadingProgress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span id="progressText">0%</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Detalhes -->
+    <div class="modal-overlay" id="itemModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detalhes do Item</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo do modal será inserido via JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <script src="main.js"></script>
+    
+    <script>
+        // Funções auxiliares específicas do HTML
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            const notificationIcon = document.getElementById('notification-icon');
+            
+            // Configurar ícone baseado no tipo
+            let iconClass = 'fa-info-circle';
+            if (type === 'success') iconClass = 'fa-check-circle';
+            else if (type === 'error') iconClass = 'fa-exclamation-circle';
+            else if (type === 'warning') iconClass = 'fa-exclamation-triangle';
+            
+            notificationIcon.className = `fas ${iconClass}`;
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            // Esconder automaticamente após 5 segundos
+            setTimeout(hideNotification, 5000);
+        }
+        
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                notification.style.display = 'none';
+                notification.style.animation = '';
+            }, 300);
+        }
+        
+        function toggleChartType(chartName) {
+            // Esta função será implementada no main.js
+            if (window.toggleChartType) {
+                window.toggleChartType(chartName);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+        }
+        
+        // Preencher campos obrigatórios
+        document.addEventListener('DOMContentLoaded', function() {
+            const requiredFields = [
+                'ID_Item', 'Codigo_Patrimonial', 'Nome_Item', 'Número de serie',
+                'Categoria', 'Descrição', 'Quantidade', 'Estado_Conservação',
+                'Data_Aquisição', 'Valor_Aquisição', 'Fonte_Aquisição', 'Fornecedor',
+                'Localização_Item', 'Distrito_Localização', 'Uso_Actual',
+                'Responsável_Item', 'Contacto_Responsável_Item', 'Vida_Util_Estimada',
+                'Data_Ultima_Verificação', 'Observações'
+            ];
+            
+            const grid = document.getElementById('requiredFieldsGrid');
+            requiredFields.forEach(field => {
+                const span = document.createElement('span');
+                span.className = 'field-tag';
+                span.textContent = field;
+                grid.appendChild(span);
+            });
+            
+            // Atualizar data atual
+            updateCurrentDate();
+        });
+        
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            const dateString = now.toLocaleDateString('pt-PT', options);
+            
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = dateString;
+            }
+        }
+        
+        // Atualizar data a cada minuto
+        setInterval(updateCurrentDate, 60000);
+    </script>
+</body>
+</html>
