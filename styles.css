@@ -40,32 +40,6 @@ body {
     align-items: center;
 }
 
-/* Logo APD - NOVO */
-.apd-logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 12px 18px;
-    border-radius: 8px;
-    margin-right: 20px;
-}
-
-.apd-text {
-    font-size: 28px;
-    font-weight: 800;
-    color: #3498db;
-    letter-spacing: 1.5px;
-}
-
-.apd-label {
-    font-size: 11px;
-    color: #ecf0f1;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 3px;
-}
-
 .header-left {
     display: flex;
     align-items: center;
@@ -347,19 +321,10 @@ body {
     margin-bottom: 10px;
 }
 
-/* Ajuste para valor total com números longos - NOVO */
-.patrimony-value {
+/* Ajuste para valor total com números longos */
+.smaller-font {
     font-size: 19px !important;
     line-height: 1.2;
-    word-break: break-word;
-}
-
-.patrimony-value.font-small {
-    font-size: 17px !important;
-}
-
-.patrimony-value.font-very-small {
-    font-size: 15px !important;
 }
 
 .currency-symbol {
@@ -870,15 +835,6 @@ tr:hover {
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* @Falcandra Data Consulting - NOVO */
-.consulting-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: #3498db;
-    margin-bottom: 10px;
-    font-style: italic;
-}
-
 .footer p {
     opacity: 0.8;
     font-size: 14px;
@@ -1122,6 +1078,30 @@ tr:hover {
 .p-20 { padding: 20px; }
 .p-30 { padding: 30px; }
 
+/* ===== FALCANDRA BRANDING ===== */
+.falcandra-branding {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.falcandra-branding hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
+}
+
+.falcandra-branding p {
+    font-size: 14px;
+    color: #3498db;
+    font-weight: 600;
+    font-style: italic;
+}
+
+/* ===== REMOVED FILTER CONTROLS ===== */
+.value-filter-controls {
+    display: none !important;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
     .header-content {
@@ -1134,11 +1114,6 @@ tr:hover {
         flex-direction: column;
         text-align: center;
         gap: 15px;
-    }
-    
-    .apd-logo {
-        margin-right: 0;
-        margin-bottom: 10px;
     }
     
     .upload-card {
@@ -1266,57 +1241,5 @@ tr:hover {
     .recommendations-section {
         box-shadow: none;
         border: 1px solid #ddd;
-    }
-}
-
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-    }
-    
-    .upload-card,
-    .kpi-card,
-    .chart-container,
-    .table-container,
-    .summary-section,
-    .recommendations-section,
-    .filters-section {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
-    
-    .section-title,
-    .chart-container h3,
-    .table-container h3,
-    .summary-text h4,
-    .recommendation-content p {
-        color: #e0e0e0;
-    }
-    
-    th {
-        background-color: #3d3d3d;
-        color: #e0e0e0;
-    }
-    
-    .kpi-label,
-    .summary-text p,
-    .pagination-info {
-        color: #b0b0b0;
-    }
-    
-    .filter-group select,
-    .filter-group input,
-    .search-box input {
-        background-color: #3d3d3d;
-        color: #e0e0e0;
-        border-color: #555;
-    }
-    
-    .kpi-details,
-    .summary-item,
-    .recommendation-item {
-        background-color: #3d3d3d;
     }
 }
