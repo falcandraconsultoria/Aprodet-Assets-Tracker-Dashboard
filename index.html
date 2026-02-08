@@ -1,1 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APRODET - Dashboard Patrimonial</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Tela de Boas-Vindas -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-container">
+            <div class="welcome-logo">
+                <div class="logo-circle">
+                    <span class="logo-text">APD</span>
+                </div>
+                <h1>APRODET Dashboard</h1>
+                <p class="subtitle">Sistema Inteligente de Gestão Patrimonial</p>
+            </div>
+            
+            <div class="welcome-content">
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3>Upload de Arquivos</h3>
+                        <p>Carregue ficheiros Excel (.xlsx, .xls) ou CSV com os dados do patrimônio</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Análise Visual</h3>
+                        <p>Visualizações interativas com gráficos e indicadores em tempo real</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <h3>Filtros Avançados</h3>
+                        <p>Filtre dados por categoria, distrito, estado de conservação e mais</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3>Exportação PDF</h3>
+                        <p>Gere relatórios profissionais em PDF para partilha e arquivo</p>
+                    </div>
+                </div>
+                
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>Carregar Ficheiro</h3>
+                        <p>Arraste ou clique para selecionar arquivo Excel/CSV</p>
+                        <input type="file" id="fileInputHome" accept=".xlsx,.xls,.csv" hidden>
+                        <button class="btn-primary" id="selectFileBtn">
+                            <i class="fas fa-folder-open"></i> Selecionar Arquivo
+                        </button>
+                        <p class="file-requirements">Suporta: .xlsx, .xls, .csv</p>
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-details">
+                            <i class="fas fa-file-excel file-icon"></i>
+                            <div class="file-text">
+                                <h4 id="fileNameDisplay">Nome do arquivo</h4>
+                                <p id="fileSizeDisplay">Tamanho</p>
+                            </div>
+                            <button class="btn-clear" id="clearFileBtn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="btn-start" id="startAnalysisBtn">
+                            <i class="fas fa-rocket"></i> Iniciar Análise
+                        </button>
+                    </div>
+                    
+                    <div class="requirements">
+                        <h4><i class="fas fa-list-check"></i> Campos Obrigatórios:</h4>
+                        <div class="fields-grid">
+                            <span class="field-tag">ID_Item</span>
+                            <span class="field-tag">Codigo_Patrimonial</span>
+                            <span class="field-tag">Nome_Item</span>
+                            <span class="field-tag">Número de serie</span>
+                            <span class="field-tag">Categoria</span>
+                            <span class="field-tag">Descrição</span>
+                            <span class="field-tag">Quantidade</span>
+                            <span class="field-tag">Estado_Conservação</span>
+                            <span class="field-tag">Data_Aquisição</span>
+                            <span class="field-tag">Valor_Aquisição</span>
+                            <span class="field-tag">Fonte_Aquisição</span>
+                            <span class="field-tag">Fornecedor</span>
+                            <span class="field-tag">Localização_Item</span>
+                            <span class="field-tag">Distrito_Localização</span>
+                            <span class="field-tag">Uso_Actual</span>
+                            <span class="field-tag">Responsável_Item</span>
+                            <span class="field-tag">Contacto_Responsável</span>
+                            <span class="field-tag">Vida_Util_Estimada</span>
+                            <span class="field-tag">Data_Ultima_Verificação</span>
+                            <span class="field-tag">Observações</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-footer">
+                <p class="footer-text">
+                    <i class="fas fa-shield-alt"></i> Seus dados são processados localmente e não são armazenados em servidores externos
+                </p>
+                <p class="version">Versão 1.0 | APRODET Dashboard</p>
+            </div>
+        </div>
+    </div>
 
+    <!-- Dashboard (inicialmente oculto) -->
+    <div id="dashboardContainer" style="display: none;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
