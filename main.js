@@ -1,14 +1,17 @@
 // main.js - APRODET Dashboard - Sistema Completo
 // Complemento total para o index.html
 // MODIFICAÇÕES APLICADAS:
-// 1. Barra superior azul com quatro pontos acima de "APRODET" (laranja)
-// 2. Filtros Avançados movidos para acima dos cards de resumo
-// 3. SEM ÍCONES nos cards (mantidos apenas números/texto)
-// 4. "Todos os Itens" acima de "Itens Críticos"
-// 5. Ajuste do tamanho da fonte no card "Valor Total do Patrimônio"
-// 6. Remoção dos filtros de valor mínimo e máximo
-// 7. Ajustes nos gráficos conforme solicitado
-// 8. Adição de "@Falcandra Data Consulting" no footer
+// 1. Barra superior com quatro pontos acima de "APRODET" (cor #3B82F6)
+// 2. "APRODET Dashboard" alinhado à direita acima do subtítulo
+// 3. Data/hora com fonte menor
+// 4. Cards com cor transparente (rgba(147, 197, 253, 0.15)) combinando com logotipo
+// 5. Filtros Avançados movidos para acima dos cards de resumo
+// 6. SEM ÍCONES nos cards (mantidos apenas números/texto)
+// 7. "Todos os Itens" acima de "Itens Críticos"
+// 8. Ajuste do tamanho da fonte no card "Valor Total do Patrimônio"
+// 9. Remoção dos filtros de valor mínimo e máximo
+// 10. Ajustes nos gráficos conforme solicitado
+// 11. Adição de "@Falcandra Data Consulting" no footer
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
@@ -1788,6 +1791,9 @@ function updateCurrentDate() {
     const dateElement = document.getElementById('currentDate');
     if (dateElement) {
         dateElement.textContent = dateString;
+        // APLICAR ESTILO COM FONTE MENOR
+        dateElement.style.fontSize = '0.9rem';
+        dateElement.style.color = '#6B7280';
     }
 }
 
@@ -1991,3 +1997,25 @@ setTimeout(() => {
         Chart.defaults.color = '#6B7280';
     }
 }, 100);
+
+// ===== FUNÇÃO PARA AJUSTAR LAYOUT DO HEADER =====
+function adjustHeaderLayout() {
+    // Ajustar posicionamento do "APRODET Dashboard" no header
+    const headerRight = document.querySelector('.header-right');
+    const currentFileInfo = document.getElementById('currentFileInfo');
+    
+    if (headerRight && currentFileInfo) {
+        // Criar container para o título
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'dashboard-title-container';
+        titleContainer.innerHTML = `
+            <h1 class="dashboard-title">APRODET Dashboard</h1>
+        `;
+        
+        // Inserir antes do currentFileInfo
+        headerRight.insertBefore(titleContainer, currentFileInfo);
+    }
+}
+
+// Chamar a função após carregamento completo
+document.addEventListener('DOMContentLoaded', adjustHeaderLayout);
