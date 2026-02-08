@@ -1,10 +1,14 @@
 // main.js - APRODET Dashboard - Sistema Completo
 // Complemento total para o index.html
 // MODIFICAÇÕES APLICADAS:
-// 1. Ajuste do tamanho da fonte no card "Valor Total do Patrimônio"
-// 2. Remoção dos filtros de valor mínimo e máximo
-// 3. Ajustes nos gráficos conforme solicitado
-// 4. Adição de "@Falcandra Data Consulting" no footer
+// 1. Barra superior azul com quatro pontos acima de "APRODET" (laranja)
+// 2. Filtros Avançados movidos para acima dos cards de resumo
+// 3. Ícones nos cards correspondentes a cada título
+// 4. "Todos os Itens" acima de "Itens Críticos"
+// 5. Ajuste do tamanho da fonte no card "Valor Total do Patrimônio"
+// 6. Remoção dos filtros de valor mínimo e máximo
+// 7. Ajustes nos gráficos conforme solicitado
+// 8. Adição de "@Falcandra Data Consulting" no footer
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
@@ -74,6 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Adicionar @Falcandra Data Consulting no footer
     addFalcandraBranding();
+    
+    // Aplicar estilo para barra superior azul
+    applyHeaderStyles();
 });
 
 function initializeApplication() {
@@ -93,6 +100,120 @@ function initializeApplication() {
 function setupDOMReferences() {
     // Elementos serão referenciados por ID diretamente
     // Esta função garante que todos os elementos existem
+}
+
+function applyHeaderStyles() {
+    // Adicionar estilos para barra superior azul com APRODET laranja
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Barra superior azul com quatro pontos e APRODET laranja */
+        .header-container {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            padding: 15px 30px;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-container::before {
+            content: "⋯";
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 28px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+        
+        .aprodet-logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #f97316 !important; /* Laranja */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .dashboard-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            flex-grow: 1;
+        }
+        
+        /* Estilo para cards com ícones */
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .card-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        /* Filtros acima dos cards */
+        .filters-section {
+            margin-bottom: 30px;
+        }
+        
+        /* Ordenação das seções */
+        .tables-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* Fonte menor apenas para valor total */
+        .smaller-font {
+            font-size: 19px !important;
+            line-height: 1.2;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .aprodet-logo {
+                font-size: 24px;
+            }
+            
+            .dashboard-title {
+                font-size: 18px;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 function setupRequiredFields() {
@@ -528,24 +649,48 @@ function updateIndicatorsUI() {
     // Formatar valor em MZN
     const formattedValue = formatCurrency(indicators.totalValue);
     
-    // Atualizar cards - APENAS O VALOR TOTAL DO PATRIMÔNIO COM FONTE MENOR
-    const totalValueElement = document.getElementById('totalValue');
-    if (totalValueElement) {
-        totalValueElement.innerHTML = 
-            `<span class="currency-symbol">MZN</span> ${formattedValue}`;
-        
-        // Aplicar classe para fonte menor apenas neste card
-        totalValueElement.classList.add('smaller-font');
-    }
+    // Atualizar cards com ícones - APENAS O VALOR TOTAL DO PATRIMÔNIO COM FONTE MENOR
+    const cards = [
+        {
+            id: 'totalValue',
+            icon: '💰',
+            value: formattedValue,
+            label: 'Valor Total do Patrimônio',
+            smallFont: true
+        },
+        {
+            id: 'totalItems',
+            icon: '📦',
+            value: indicators.totalItems.toLocaleString('pt-PT'),
+            label: 'Total de Itens',
+            smallFont: false
+        },
+        {
+            id: 'avgStatus',
+            icon: '📊',
+            value: `${indicators.avgStatus}%`,
+            label: 'Índice de Conservação',
+            smallFont: false
+        },
+        {
+            id: 'criticalItems',
+            icon: '⚠️',
+            value: indicators.criticalItems.toLocaleString('pt-PT'),
+            label: 'Itens Críticos',
+            smallFont: false
+        }
+    ];
     
-    document.getElementById('totalItems').textContent = 
-        indicators.totalItems.toLocaleString('pt-PT');
-    
-    document.getElementById('avgStatus').textContent = 
-        `${indicators.avgStatus}%`;
-    
-    document.getElementById('criticalItems').textContent = 
-        indicators.criticalItems.toLocaleString('pt-PT');
+    cards.forEach(card => {
+        const element = document.getElementById(card.id);
+        if (element) {
+            element.innerHTML = `
+                <div class="card-icon">${card.icon}</div>
+                <div class="card-value ${card.smallFont ? 'smaller-font' : ''}">${card.value}</div>
+                <div class="card-label">${card.label}</div>
+            `;
+        }
+    });
     
     // Atualizar contador de itens críticos
     const criticalCount = document.getElementById('criticalCount');
@@ -1006,63 +1151,9 @@ window.toggleChartType = function(chartName) {
 
 // ===== TABELAS =====
 function updateTables() {
-    updateCriticalTable();
-    updateAllItemsTable();
+    updateAllItemsTable(); // "Todos os Itens" PRIMEIRO
+    updateCriticalTable(); // "Itens Críticos" DEPOIS
     updatePagination();
-}
-
-function updateCriticalTable() {
-    const tbody = document.getElementById('criticalTableBody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    // Filtrar itens críticos
-    const criticalItems = STATE.filteredData.filter(item => {
-        const status = item['Estado_Conservação'];
-        const value = parseFloat(item['Valor_Aquisição']) || 0;
-        return status === 'Ruim' && value > 10000;
-    });
-    
-    if (criticalItems.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-table">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <h4>Nenhum item crítico encontrado</h4>
-                        <p>Todos os itens estão em bom ou regular estado</p>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    // Adicionar itens à tabela
-    criticalItems.slice(0, 20).forEach(item => {
-        const row = document.createElement('tr');
-        const value = parseFloat(item['Valor_Aquisição']) || 0;
-        
-        row.innerHTML = `
-            <td><strong>${escapeHtml(item['ID_Item'] || '')}</strong></td>
-            <td>${escapeHtml(item['Nome_Item'] || '')}</td>
-            <td><span class="category-tag">${escapeHtml(item['Categoria'] || '')}</span></td>
-            <td><span class="status-badge status-bad">${escapeHtml(item['Estado_Conservação'] || '')}</span></td>
-            <td><strong>${formatCurrency(value)}</strong></td>
-            <td>${escapeHtml(item['Localização_Item'] || '')}</td>
-            <td>
-                <button class="btn-icon" onclick="showItemDetails('${item['ID_Item']}')" title="Ver detalhes">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn-icon" onclick="exportItem('${item['ID_Item']}')" title="Exportar item">
-                    <i class="fas fa-download"></i>
-                </button>
-            </td>
-        `;
-        
-        tbody.appendChild(row);
-    });
 }
 
 function updateAllItemsTable() {
@@ -1111,6 +1202,60 @@ function updateAllItemsTable() {
             <td>
                 <button class="btn-icon" onclick="showItemDetails('${item['ID_Item']}')" title="Ver detalhes">
                     <i class="fas fa-info-circle"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+function updateCriticalTable() {
+    const tbody = document.getElementById('criticalTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    // Filtrar itens críticos
+    const criticalItems = STATE.filteredData.filter(item => {
+        const status = item['Estado_Conservação'];
+        const value = parseFloat(item['Valor_Aquisição']) || 0;
+        return status === 'Ruim' && value > 10000;
+    });
+    
+    if (criticalItems.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-table">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h4>Nenhum item crítico encontrado</h4>
+                        <p>Todos os itens estão em bom ou regular estado</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Adicionar itens à tabela
+    criticalItems.slice(0, 20).forEach(item => {
+        const row = document.createElement('tr');
+        const value = parseFloat(item['Valor_Aquisição']) || 0;
+        
+        row.innerHTML = `
+            <td><strong>${escapeHtml(item['ID_Item'] || '')}</strong></td>
+            <td>${escapeHtml(item['Nome_Item'] || '')}</td>
+            <td><span class="category-tag">${escapeHtml(item['Categoria'] || '')}</span></td>
+            <td><span class="status-badge status-bad">${escapeHtml(item['Estado_Conservação'] || '')}</span></td>
+            <td><strong>${formatCurrency(value)}</strong></td>
+            <td>${escapeHtml(item['Localização_Item'] || '')}</td>
+            <td>
+                <button class="btn-icon" onclick="showItemDetails('${item['ID_Item']}')" title="Ver detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon" onclick="exportItem('${item['ID_Item']}')" title="Exportar item">
+                    <i class="fas fa-download"></i>
                 </button>
             </td>
         `;
@@ -2000,14 +2145,4 @@ setTimeout(() => {
         Chart.defaults.font.family = "'Poppins', sans-serif";
         Chart.defaults.color = '#6B7280';
     }
-    
-    // Adicionar estilo CSS para fonte menor no card de valor total
-    const style = document.createElement('style');
-    style.textContent = `
-        .smaller-font {
-            font-size: 19px !important;
-            line-height: 1.2;
-        }
-    `;
-    document.head.appendChild(style);
 }, 100);
