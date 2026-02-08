@@ -3,7 +3,7 @@
 // MODIFICAÇÕES APLICADAS:
 // 1. Barra superior azul com quatro pontos acima de "APRODET" (laranja)
 // 2. Filtros Avançados movidos para acima dos cards de resumo
-// 3. Ícones nos cards correspondentes a cada título
+// 3. SEM ÍCONES nos cards (mantidos apenas números/texto)
 // 4. "Todos os Itens" acima de "Itens Críticos"
 // 5. Ajuste do tamanho da fonte no card "Valor Total do Patrimônio"
 // 6. Remoção dos filtros de valor mínimo e máximo
@@ -78,9 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Adicionar @Falcandra Data Consulting no footer
     addFalcandraBranding();
-    
-    // Aplicar estilo para barra superior azul
-    applyHeaderStyles();
 });
 
 function initializeApplication() {
@@ -100,120 +97,6 @@ function initializeApplication() {
 function setupDOMReferences() {
     // Elementos serão referenciados por ID diretamente
     // Esta função garante que todos os elementos existem
-}
-
-function applyHeaderStyles() {
-    // Adicionar estilos para barra superior azul com APRODET laranja
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Barra superior azul com quatro pontos e APRODET laranja */
-        .header-container {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            padding: 15px 30px;
-            border-radius: 0 0 15px 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header-container::before {
-            content: "⋯";
-            position: absolute;
-            top: 10px;
-            left: 20px;
-            font-size: 28px;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: bold;
-            line-height: 1;
-        }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: white;
-        }
-        
-        .aprodet-logo {
-            font-size: 28px;
-            font-weight: 800;
-            color: #f97316 !important; /* Laranja */
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1px;
-        }
-        
-        .dashboard-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: white;
-            flex-grow: 1;
-        }
-        
-        /* Estilo para cards com ícones */
-        .card {
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        .card-icon {
-            font-size: 32px;
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }
-        
-        .card-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 10px 0;
-        }
-        
-        .card-label {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        
-        /* Filtros acima dos cards */
-        .filters-section {
-            margin-bottom: 30px;
-        }
-        
-        /* Ordenação das seções */
-        .tables-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-        
-        /* Fonte menor apenas para valor total */
-        .smaller-font {
-            font-size: 19px !important;
-            line-height: 1.2;
-        }
-        
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }
-            
-            .aprodet-logo {
-                font-size: 24px;
-            }
-            
-            .dashboard-title {
-                font-size: 18px;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 function setupRequiredFields() {
@@ -649,48 +532,25 @@ function updateIndicatorsUI() {
     // Formatar valor em MZN
     const formattedValue = formatCurrency(indicators.totalValue);
     
-    // Atualizar cards com ícones - APENAS O VALOR TOTAL DO PATRIMÔNIO COM FONTE MENOR
-    const cards = [
-        {
-            id: 'totalValue',
-            icon: '💰',
-            value: formattedValue,
-            label: 'Valor Total do Patrimônio',
-            smallFont: true
-        },
-        {
-            id: 'totalItems',
-            icon: '📦',
-            value: indicators.totalItems.toLocaleString('pt-PT'),
-            label: 'Total de Itens',
-            smallFont: false
-        },
-        {
-            id: 'avgStatus',
-            icon: '📊',
-            value: `${indicators.avgStatus}%`,
-            label: 'Índice de Conservação',
-            smallFont: false
-        },
-        {
-            id: 'criticalItems',
-            icon: '⚠️',
-            value: indicators.criticalItems.toLocaleString('pt-PT'),
-            label: 'Itens Críticos',
-            smallFont: false
-        }
-    ];
+    // Atualizar cards - APENAS O VALOR TOTAL DO PATRIMÔNIO COM FONTE MENOR
+    // SEM ÍCONES - APENAS NÚMEROS/TEXTO
+    const totalValueElement = document.getElementById('totalValue');
+    if (totalValueElement) {
+        totalValueElement.innerHTML = 
+            `<span class="currency-symbol">MZN</span> ${formattedValue}`;
+        
+        // Aplicar classe para fonte menor apenas neste card
+        totalValueElement.classList.add('smaller-font');
+    }
     
-    cards.forEach(card => {
-        const element = document.getElementById(card.id);
-        if (element) {
-            element.innerHTML = `
-                <div class="card-icon">${card.icon}</div>
-                <div class="card-value ${card.smallFont ? 'smaller-font' : ''}">${card.value}</div>
-                <div class="card-label">${card.label}</div>
-            `;
-        }
-    });
+    document.getElementById('totalItems').textContent = 
+        indicators.totalItems.toLocaleString('pt-PT');
+    
+    document.getElementById('avgStatus').textContent = 
+        `${indicators.avgStatus}%`;
+    
+    document.getElementById('criticalItems').textContent = 
+        indicators.criticalItems.toLocaleString('pt-PT');
     
     // Atualizar contador de itens críticos
     const criticalCount = document.getElementById('criticalCount');
@@ -1151,8 +1011,8 @@ window.toggleChartType = function(chartName) {
 
 // ===== TABELAS =====
 function updateTables() {
-    updateAllItemsTable(); // "Todos os Itens" PRIMEIRO
-    updateCriticalTable(); // "Itens Críticos" DEPOIS
+    updateAllItemsTable(); // "Todos os Itens" PRIMEIRO (acima)
+    updateCriticalTable(); // "Itens Críticos" DEPOIS (abaixo)
     updatePagination();
 }
 
@@ -1540,10 +1400,6 @@ function collectFilterValues() {
     STATE.filters.use = getSelectValue('useFilter');
     
     // REMOVIDOS: minValue e maxValue
-    // const minValue = document.getElementById('minValue')?.value;
-    // const maxValue = document.getElementById('maxValue')?.value;
-    // STATE.filters.minValue = minValue ? parseFloat(minValue) : null;
-    // STATE.filters.maxValue = maxValue ? parseFloat(maxValue) : null;
 }
 
 function getSelectValue(selectId) {
@@ -1578,15 +1434,6 @@ function applyAllFilters(item) {
     if (filters.use !== 'all' && filters.use !== item['Uso_Actual']) {
         return false;
     }
-    
-    // REMOVIDOS: Filtros de valor
-    // const value = parseFloat(item['Valor_Aquisição']) || 0;
-    // if (filters.minValue !== null && value < filters.minValue) {
-    //     return false;
-    // }
-    // if (filters.maxValue !== null && value > filters.maxValue) {
-    //     return false;
-    // }
     
     // Filtro de busca
     if (STATE.searchTerm && STATE.searchTerm.trim() !== '') {
@@ -1640,8 +1487,6 @@ function resetFilters() {
         }
     });
     
-    // REMOVIDOS: document.getElementById('minValue').value = '';
-    // REMOVIDOS: document.getElementById('maxValue').value = '';
     document.getElementById('tableSearch').value = '';
     
     // Resetar dados filtrados
