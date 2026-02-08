@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- ===== PÁGINA DE UPLOAD ===== -->
     <div id="uploadPage">
         <div class="welcome-screen">
             <div class="welcome-container">
@@ -25,81 +24,40 @@
                     <p class="subtitle">Sistema Inteligente de Gestão Patrimonial</p>
                 </div>
                 
-                <div class="welcome-content">
-                    <div class="features">
-                        <div class="feature-card">
-                            <div class="feature-icon"><i class="fas fa-file-upload"></i></div>
-                            <h3>Upload de Arquivos</h3>
-                            <p>Carregue ficheiros Excel (.xlsx, .xls) ou CSV</p>
-                        </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-                            <h3>Análise Visual</h3>
-                            <p>Gráficos interativos e indicadores em tempo real</p>
-                        </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon"><i class="fas fa-filter"></i></div>
-                            <h3>Filtros Avançados</h3>
-                            <p>Filtre por categoria, distrito, estado e mais</p>
-                        </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon"><i class="fas fa-file-pdf"></i></div>
-                            <h3>Exportação PDF</h3>
-                            <p>Gere relatórios profissionais para partilha</p>
-                        </div>
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>Carregar Ficheiro</h3>
+                        <p>Arraste ou clique para selecionar arquivo</p>
+                        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+                        <button class="btn-primary" id="selectFileBtn">
+                            <i class="fas fa-folder-open"></i> Selecionar Arquivo
+                        </button>
                     </div>
-                    
-                    <div class="upload-section">
-                        <div class="upload-area" id="uploadArea">
-                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                            <h3>Carregar Ficheiro</h3>
-                            <p>Arraste ou clique para selecionar arquivo</p>
-                            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
-                            <button class="btn-primary" id="selectFileBtn">
-                                <i class="fas fa-folder-open"></i> Selecionar Arquivo
-                            </button>
-                            <p class="file-requirements">Suporta: .xlsx, .xls, .csv</p>
-                        </div>
-                        
-                        <div class="file-info" id="fileInfo" style="display: none;">
-                            <div class="file-details">
-                                <i class="fas fa-file-excel file-icon"></i>
-                                <div class="file-text">
-                                    <h4 id="fileNameDisplay">Arquivo selecionado</h4>
-                                    <p id="fileSizeDisplay">Tamanho do arquivo</p>
-                                </div>
-                                <button class="btn-clear" id="clearFileBtn"><i class="fas fa-times"></i></button>
+
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-details">
+                            <i class="fas fa-file-excel file-icon"></i>
+                            <div class="file-text">
+                                <h4 id="fileNameDisplay">Arquivo selecionado</h4>
                             </div>
-                            <button class="btn-start" id="startAnalysisBtn">
-                                <i class="fas fa-rocket"></i> Iniciar Análise
-                            </button>
                         </div>
+                        <button class="btn-start" id="startAnalysisBtn">
+                            <i class="fas fa-rocket"></i> Iniciar Análise
+                        </button>
                     </div>
-                </div>
-                
-                <div class="welcome-footer">
-                    <p><i class="fas fa-shield-alt"></i> Processamento local - seus dados não saem do seu computador</p>
-                    <p class="version">APRODET Dashboard v1.0</p>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- ===== DASHBOARD (inicialmente oculto) ===== -->
     <div id="dashboardPage" style="display: none;">
-        <!-- Todo o conteúdo do dashboard vai aqui -->
         <header class="header">
             <div class="container">
                 <div class="header-content">
                     <div class="logo-section">
                         <div class="logo-placeholder">APD</div>
-                        <div class="title">
-                            <h1>APRODET Dashboard</h1>
-                            <p id="dashboard-subtitle">Análise Patrimonial em Tempo Real</p>
-                        </div>
+                        <h1>APRODET Dashboard</h1>
                     </div>
                     <div class="header-actions">
                         <button class="btn-header" id="backToHomeBtn" title="Voltar">
@@ -109,9 +67,8 @@
                 </div>
             </div>
         </header>
-        
+
         <div class="container">
-            <!-- Cards de Indicadores -->
             <div class="indicators">
                 <div class="card">
                     <div class="card-header">
@@ -122,39 +79,9 @@
                         <div class="card-icon"><i class="fas fa-coins"></i></div>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">Total de Itens</div>
-                            <div class="card-value" id="totalItems">0</div>
-                        </div>
-                        <div class="card-icon"><i class="fas fa-boxes"></i></div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">Estado Médio</div>
-                            <div class="card-value" id="avgStatus">0%</div>
-                        </div>
-                        <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">Itens Críticos</div>
-                            <div class="card-value" id="criticalItems">0</div>
-                        </div>
-                        <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    </div>
-                </div>
+                <!-- Cards de indicadores similares podem ser inseridos aqui -->
             </div>
-            
-            <!-- Gráficos -->
+
             <div class="charts-grid">
                 <div class="chart-container">
                     <h3><i class="fas fa-chart-pie"></i> Valor por Categoria</h3>
@@ -162,40 +89,9 @@
                         <canvas id="categoryChart"></canvas>
                     </div>
                 </div>
-                
-                <div class="chart-container">
-                    <h3><i class="fas fa-chart-bar"></i> Estado de Conservação</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tabela -->
-            <div class="table-section">
-                <h3><i class="fas fa-list"></i> Itens do Inventário</h3>
-                <div class="table-container">
-                    <table id="itemsTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Categoria</th>
-                                <th>Estado</th>
-                                <th>Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsTableBody">
-                            <!-- Dados serão inseridos aqui -->
-                        </tbody>
-                    </table>
-                </div>
+                <!-- Gráficos adicionais -->
             </div>
         </div>
-        
-        <footer class="footer">
-            <p>APRODET Dashboard | Processamento local | Dados de demonstração</p>
-        </footer>
     </div>
 
     <script src="main.js"></script>
