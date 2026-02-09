@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Análise Patrimonial</title>
+    <title>APRODET Dashboard - Análise Patrimonial</title>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -36,7 +36,7 @@
             padding: 0 20px;
         }
         
-        /* ===== NOVA BARRA SUPERIOR AZUL SEM APRODET ===== */
+        /* ===== HEADER COM LOGOTIPO APRODET NO TÍTULO ===== */
         .header-container {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             padding: 20px 30px;
@@ -54,27 +54,43 @@
             color: white;
         }
         
-        .header-left {
+        /* LOGOTIPO APRODET INTEGRADO AO TÍTULO */
+        .aprodet-title-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .aprodet-logo-graphic {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            gap: 4px;
         }
         
-        .logo-circles {
+        .logo-circle-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
         }
         
-        .circle {
-            width: 12px;
-            height: 12px;
+        .logo-circle {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background-color: #3B82F6;
+            background-color: white;
         }
         
-        .aprodet-logo {
-            font-size: 32px;
+        .dashboard-title-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .aprodet-text {
+            font-size: 28px;
             font-weight: 800;
             color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -86,17 +102,6 @@
             flex-direction: column;
             align-items: flex-end;
             text-align: right;
-        }
-        
-        .dashboard-title-container {
-            margin-bottom: 5px;
-        }
-        
-        .dashboard-title-header {
-            font-size: 24px;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 5px;
         }
         
         .header-info {
@@ -1072,17 +1077,20 @@
                 gap: 15px;
             }
             
-            .header-left, .header-right {
-                align-items: center;
-                text-align: center;
-            }
-            
-            .aprodet-logo {
-                margin-left: 0;
+            .aprodet-title-container {
+                justify-content: center;
+                margin-bottom: 10px;
             }
             
             .dashboard-title-header {
-                font-size: 20px;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .header-right {
+                align-items: center;
+                text-align: center;
             }
             
             .upload-card {
@@ -1157,15 +1165,29 @@
     </style>
 </head>
 <body>
-    <!-- Nova Barra Superior Azul (SEM APRODET) -->
+    <!-- Header com Logotipo APRODET no Título -->
     <div class="header-container">
         <div class="header-content">
-            <div class="header-left">
-                <!-- Logotipo removido -->
-                <!-- APRODET removido -->
+            <div class="aprodet-title-container">
+                <!-- Logotipo APRODET integrado ao título -->
+                <div class="dashboard-title-header">
+                    <div class="aprodet-logo-graphic">
+                        <!-- 4 círculos do logotipo -->
+                        <div class="logo-circle-row">
+                            <div class="logo-circle"></div>
+                            <div class="logo-circle"></div>
+                        </div>
+                        <div class="logo-circle-row">
+                            <div class="logo-circle"></div>
+                            <div class="logo-circle"></div>
+                        </div>
+                    </div>
+                    <div class="aprodet-text">APRODET</div>
+                    <span>Dashboard</span>
+                </div>
             </div>
+            
             <div class="header-right">
-                <!-- APRODET Dashboard removido -->
                 <div class="header-info" id="currentFileInfo">Analisando: Aprodet_Filled_Data.xlsx</div>
                 <!-- Data/hora com fonte menor -->
                 <div class="date-time" id="currentDate">carregando data...</div>
@@ -1181,8 +1203,8 @@
                     <i class="fas fa-chart-line"></i>
                 </div>
                 
-                <h1 class="upload-title">Dashboard de Análise Patrimonial</h1>
-                <p class="upload-subtitle">Carregue um arquivo Excel ou CSV para análise patrimonial</p>
+                <h1 class="upload-title">APRODET Dashboard - Análise Patrimonial</h1>
+                <p class="upload-subtitle">Carregue um arquivo Excel ou CSV para analisar o patrimônio</p>
                 
                 <div id="uploadArea" class="upload-area">
                     <i class="fas fa-cloud-upload-alt upload-icon-small"></i>
@@ -1229,7 +1251,7 @@
             <!-- Dashboard Header -->
             <div class="dashboard-header">
                 <div class="dashboard-title">
-                    <h1>Dashboard de Análise Patrimonial</h1>
+                    <h1>APRODET Dashboard - Análise Patrimonial</h1>
                     <p id="dashboardDate">Carregando data...</p>
                 </div>
                 <div class="dashboard-actions">
@@ -1493,7 +1515,7 @@
             <!-- Footer -->
             <div class="footer">
                 <!-- @Falcandra Data Consulting será adicionado por JavaScript -->
-                <p id="lastUpdate">Dashboard de Análise Patrimonial | Última atualização: --/--/---- --:--</p>
+                <p id="lastUpdate">APRODET Dashboard - Análise Patrimonial | Última atualização: --/--/---- --:--</p>
                 <p><strong>Processados:</strong> <span id="processedItems">0</span> itens | <strong>Modo:</strong> <span id="analysisMode">Demonstração</span></p>
             </div>
         </div>
