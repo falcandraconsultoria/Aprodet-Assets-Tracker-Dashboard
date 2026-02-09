@@ -36,7 +36,7 @@
             padding: 0 20px;
         }
         
-        /* ===== NOVA BARRA SUPERIOR AZUL COM 4 CÍRCULOS ===== */
+        /* ===== NOVA BARRA SUPERIOR AZUL COM LOGOTIPO REAL ===== */
         .header-container {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             padding: 20px 30px;
@@ -56,21 +56,17 @@
         
         .header-left {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            gap: 15px;
         }
         
-        .logo-circles {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .circle {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #3B82F6;
+        /* LOGOTIPO REAL */
+        .header-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            display: block;
         }
         
         .aprodet-logo {
@@ -1077,6 +1073,10 @@
                 text-align: center;
             }
             
+            .header-logo {
+                margin-bottom: 10px;
+            }
+            
             .aprodet-logo {
                 margin-left: 0;
             }
@@ -1157,21 +1157,16 @@
     </style>
 </head>
 <body>
-    <!-- Nova Barra Superior Azul COM 4 CÍRCULOS -->
+    <!-- Nova Barra Superior Azul COM LOGOTIPO REAL -->
     <div class="header-container">
         <div class="header-content">
             <div class="header-left">
-                <!-- 4 círculos acima de APRODET -->
-                <div class="logo-circles">
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                </div>
+                <!-- LOGOTIPO REAL (substitua logo.png pelo seu arquivo) -->
+                <img src="logo.png" alt="APRODET" class="header-logo">
                 <div class="aprodet-logo">APRODET</div>
             </div>
             <div class="header-right">
-                <!-- APRODET Dashboard acima do subtítulo -->
+                <!-- TÍTULO PRINCIPAL (ÚNICO) -->
                 <div class="dashboard-title-container">
                     <div class="dashboard-title-header">APRODET Dashboard</div>
                 </div>
@@ -1235,10 +1230,10 @@
     <!-- Dashboard Page -->
     <div id="dashboardPage" class="page" style="display: none;">
         <div class="container">
-            <!-- Dashboard Header -->
+            <!-- Dashboard Header (SEM TÍTULO DUPLICADO) -->
             <div class="dashboard-header">
                 <div class="dashboard-title">
-                    <h1>Dashboard de Análise Patrimonial</h1>
+                    <!-- TÍTULO REMOVIDO DAQUI (já está no header azul) -->
                     <p id="dashboardDate">Carregando data...</p>
                 </div>
                 <div class="dashboard-actions">
